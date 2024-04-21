@@ -1,0 +1,15 @@
+version: '3.9'
+services:
+  frontend:
+    container_name: frontend
+    image: frontend
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - 3000:3000
+    volumes:
+      - ../frontend:/app
+    command: npm run dev
