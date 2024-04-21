@@ -1,0 +1,14 @@
+# .pre-commit-config.yaml
+default_stages: [commit]
+repos:
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.1.8
+    hooks:
+    # Run the linter.
+    -   id: ruff
+        args: [ --fix ]
+        stages: [commit, manual, push]
+    # Run the formatter.
+    -   id: ruff-format
+        stages: [commit, manual, push]
