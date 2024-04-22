@@ -1,4 +1,4 @@
-from backend.app.database import database_context
+from backend.app.db.database import database_context
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
