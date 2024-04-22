@@ -1,4 +1,4 @@
-from backend.app.entities.base import DateCreatedUpdateEntity
+from app.entities.base import DateCreatedUpdateEntity
 
 
 class Item(DateCreatedUpdateEntity):

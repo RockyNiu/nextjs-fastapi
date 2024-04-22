@@ -1,8 +1,10 @@
 import random
 
-from backend.app.api.middleware import BaseMiddleware
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.api.middleware import BaseMiddleware
+from app.api.routers.item import ItemRouter
 
 app = FastAPI()
 
@@ -38,3 +40,4 @@ def get_random():
 
 
 app.include_router(RootRouter)
+app.include_router(ItemRouter)

@@ -1,7 +1,8 @@
 from typing import Optional
 
-from backend.app.db.database import DatabaseManager
 from sqlalchemy.orm import Session
+
+from app.db.database import DatabaseManager
 
 
 class BaseDAO:
