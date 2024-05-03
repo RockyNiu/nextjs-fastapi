@@ -5,6 +5,8 @@ from contextvars import ContextVar
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session
 
+from backend.app.config import ConfigLoader
+
 current_database_session: ContextVar[Session] = ContextVar("current_database_session")
 
 
@@ -28,14 +30,8 @@ class DatabaseManager:
     @classmethod
     def initialize(cls):
         if not cls._initialized:
-            config = {
-                "username": "user",
-                "password": "password",
-                "host": "db",
-                "port": "3306",
-                "database": "rockyniu",
-            }
-            cls.endpoint_url = f"mysql+mysqlconnector://{config['username']}:{config['password']}@{config['host']}:{config['port']}/{config['database']}?charset=utf8mb4"
+            config = ConfigLoader.get_config().mysql
+            cls.endpoint_url = f"mysql+mysqlconnector://{config.username}:{config.password}@{config.host}:{config.port}/{config.dbname}?charset=utf8mb4"
             # Create the database engine. The connnection only happens the first time a task is performaed against the database.
             cls.engine = create_engine(cls.endpoint_url, echo=True)
             cls._initialized = True
