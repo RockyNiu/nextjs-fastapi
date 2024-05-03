@@ -2,7 +2,9 @@
 
 ## install
 ```bash
-pip install poetry
-poetry install
-poetry shell # activate virtual environment, if not already activated. UpArrow and DownArrow won't work in current poetry version.
+pip install poetry # TIP: install poetry with admin privileges on Windows.
+poetry shell # activate virtual environment, if not already activated.
+poetry install # install dependencies.
+choco install make # install make with admin privileges on Windows.
+pre-commit # install pre-commit hooks.
 ```
