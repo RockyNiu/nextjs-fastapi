@@ -14,6 +14,7 @@ alembic = "^1.13.1"
 sqlalchemy-utc = "^0.14.0"
 mysqlclient = "^2.2.4"
 mysql-connector-python = "^8.3.0"
+dynaconf = "^3.2.5"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.3.4"
