@@ -5,7 +5,7 @@ from contextvars import ContextVar
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session
 
-from backend.app.config import ConfigLoader
+from app.config import ConfigLoader
 
 current_database_session: ContextVar[Session] = ContextVar("current_database_session")
 
