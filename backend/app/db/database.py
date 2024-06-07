@@ -59,7 +59,9 @@ def database_context():
     with Session(DatabaseManager.engine) as session:
         try:
             current_database_session.set(session)
+            logging.debug(f"Starting database session: [{session}]")
             yield
+            logging.debug(f"Committing database session: [{session}]")
             session.commit()
         except Exception as e:
             logging.error(f"Error occurred: {e}")

@@ -17,7 +17,7 @@ class ItemDAO(BaseDAO):
 
         item_orms = self.session.execute(stmt).scalars().all()
         return [Item.model_validate(item_orm) for item_orm in item_orms]
-    
+
     def create_item(self, item: Item) -> Item:
         item_orm = ItemORM(
             name=item.name,
@@ -25,12 +25,12 @@ class ItemDAO(BaseDAO):
         self.session.add(item_orm)
         self.session.refresh(item_orm)
         return Item.model_validate(item_orm)
-    
+
     def get_item_by_id(self, item_id: int) -> Item:
         stmt = select(ItemORM).where(ItemORM.id == item_id)
         item_orm = self.session.execute(stmt).scalar_one()
         return Item.model_validate(item_orm)
-    
+
     def update_item(self, item_id: int, item: Item) -> Item:
         stmt = select(ItemORM).where(ItemORM.id == item_id)
         item_orm = self.session.execute(stmt).scalar_one()

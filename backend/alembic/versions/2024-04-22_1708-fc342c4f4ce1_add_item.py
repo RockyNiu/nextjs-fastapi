@@ -49,5 +49,7 @@ def upgrade() -> None:
             {"id": 3, "name": "Item 3"},
         ],
     )
+
+
 def downgrade() -> None:
     op.drop_table("items")

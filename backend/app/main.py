@@ -1,12 +1,37 @@
+import logging
 import random
+from uuid import uuid4
 
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.api.middleware import BaseMiddleware
 from app.api.routers.item import ItemRouter
 
 app = FastAPI()
+
+cors_headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Allow-Methods": "*",
+    "Access-Control-Allow-Headers": "*",
+}
+
+
+@app.exception_handler(Exception)
+def api_catch_all_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    uuid = uuid4()
+    logging.exception(f"Uncaught exception with UUID: {uuid}")
+    return JSONResponse(
+        headers=cors_headers,
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            "type": "uncaught_error",
+            "message": f"Please contact support with the following UUID: {uuid}",
+        },
+    )
+
 
 # Configure CORS
 origins = [
