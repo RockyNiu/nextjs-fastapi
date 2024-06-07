@@ -27,18 +27,28 @@ class ItemDAO(BaseDAO):
         self.session.refresh(item_orm)
         return Item.model_validate(item_orm)
 
-    def get_item_by_id(self, item_id: int) -> Item:
+    def get_item_by_id(self, item_id: int) -> Optional[Item]:
         stmt = select(ItemORM).where(ItemORM.id == item_id)
-        item_orm = self.session.execute(stmt).scalar_one()
+        item_orm = self.session.execute(stmt).scalar_one_or_none()
+        if item_orm is None:
+            return None
         return Item.model_validate(item_orm)
 
     def update_item(self, item: ItemUpdate) -> Item:
         item_id = item.id
         stmt = select(ItemORM).where(ItemORM.id == item_id)
-        item_orm = self.session.execute(stmt).scalar_one()
+        item_orm = self.session.execute(stmt).scalar_one_or_none()
         if item_orm is None:
             raise ValueError(f"Item with id {item_id} not found")
         item_orm.name = item.name
         self.session.flush()
         self.session.refresh(item_orm)
         return Item.model_validate(item_orm)
+
+    def delete_item(self, item_id: int) -> None:
+        stmt = select(ItemORM).where(ItemORM.id == item_id)
+        item_orm = self.session.execute(stmt).scalar_one_or_none()
+        if item_orm is None:
+            raise ValueError(f"Item with id {item_id} not found")
+        self.session.delete(item_orm)
+        self.session.flush()

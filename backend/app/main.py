@@ -2,7 +2,7 @@ import logging
 import random
 from uuid import uuid4
 
-from fastapi import APIRouter, FastAPI, Request, status
+from fastapi import APIRouter, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -17,6 +17,15 @@ cors_headers = {
     "Access-Control-Allow-Methods": "*",
     "Access-Control-Allow-Headers": "*",
 }
+
+
+@app.exception_handler(HTTPException)
+def api_http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
+    return JSONResponse(
+        headers=cors_headers,
+        status_code=exc.status_code,
+        content={"type": "http_error", "message": exc.detail},
+    )
 
 
 @app.exception_handler(Exception)

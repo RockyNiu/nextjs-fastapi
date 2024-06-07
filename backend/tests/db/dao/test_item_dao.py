@@ -32,3 +32,12 @@ class TestItemDAO(DaoTest):
         assert updated_item is not None
         assert updated_item.id == persisted_item.id
         assert updated_item.name == item_update.name
+
+    def test_delete_item(self, any_item: Item):
+        item = self.item_dao.create_item(any_item)
+        item_created = self.item_dao.get_item_by_id(item.id)
+        assert item_created is not None
+
+        self.item_dao.delete_item(item.id)
+        item_deleted = self.item_dao.get_item_by_id(item.id)
+        assert item_deleted is None
