@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.db.base_dao import BaseDAO
 from app.db.orm.item_orm import ItemORM
-from app.entities.item import Item
+from app.entities.item import Item, ItemCreate, ItemUpdate
 
 
 class ItemDAO(BaseDAO):
@@ -18,11 +18,12 @@ class ItemDAO(BaseDAO):
         item_orms = self.session.execute(stmt).scalars().all()
         return [Item.model_validate(item_orm) for item_orm in item_orms]
 
-    def create_item(self, item: Item) -> Item:
+    def create_item(self, item: ItemCreate) -> Item:
         item_orm = ItemORM(
             name=item.name,
         )
         self.session.add(item_orm)
+        self.session.flush()
         self.session.refresh(item_orm)
         return Item.model_validate(item_orm)
 
@@ -31,11 +32,13 @@ class ItemDAO(BaseDAO):
         item_orm = self.session.execute(stmt).scalar_one()
         return Item.model_validate(item_orm)
 
-    def update_item(self, item_id: int, item: Item) -> Item:
+    def update_item(self, item: ItemUpdate) -> Item:
+        item_id = item.id
         stmt = select(ItemORM).where(ItemORM.id == item_id)
         item_orm = self.session.execute(stmt).scalar_one()
         if item_orm is None:
             raise ValueError(f"Item with id {item_id} not found")
         item_orm.name = item.name
+        self.session.flush()
         self.session.refresh(item_orm)
         return Item.model_validate(item_orm)
