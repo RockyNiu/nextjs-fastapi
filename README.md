@@ -12,7 +12,7 @@ This project is a fullstack template combining [Next.js](https://nextjs.org/) fo
 
 ## Prerequisites
 - Docker and Docker Compose installed on your system
-- Python 3.8 or higher installed on your system
+- Python 3.10 or higher installed on your system
 - Node.js and npm installed on your system
 
 ## Quick Start
