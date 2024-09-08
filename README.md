@@ -130,7 +130,7 @@ nextjs-fastapi/
 │   ├── docker-compose.yml
 │   ├── docker-compose-frontend.yml
 │   └── docker-compose-debug.yml
-├── LICENSE
+├── .gitignore
 └── README.md
 ```
 ## Contributing
