@@ -4,8 +4,10 @@
   ```bash
   brew install pipx # install pipx.
   pipx install poetry # install poetry.
+  poetry self add poetry-plugin-shell # if poetry >= 2.0
   brew install mysql # install mysql client.
   poetry shell # activate virtual environment, if not already activated.
+  poetry lock # update poetry.lock file
   poetry install # install dependencies.
   ```
 - in `config` directory, create a .secrets.test.toml file and a .secrets.development.toml file with the following content:
