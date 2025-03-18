@@ -2,7 +2,9 @@
 
 - install
   ```bash
-  pip install poetry # install poetry.
+  brew install pipx # install pipx.
+  pipx install poetry # install poetry.
+  brew install mysql # install mysql client.
   poetry shell # activate virtual environment, if not already activated.
   poetry install # install dependencies.
   ```
