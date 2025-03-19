@@ -10,20 +10,20 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-fastapi = "^0.110.2"
-sqlalchemy = "^2.0.29"
-uvicorn = "^0.29.0"
 alembic = "^1.13.1"
-sqlalchemy-utc = "^0.14.0"
-mysqlclient = "^2.2.4"
-mysql-connector-python = "^8.3.0"
 dynaconf = "^3.2.5"
 faker = "^25.6.0"
+fastapi = "^0.110.2"
+mysql-connector-python = "^8.3.0"
+mysqlclient = "^2.2.4"
+sqlalchemy = "^2.0.29"
+sqlalchemy-utc = "^0.14.0"
+uvicorn = "^0.29.0"
 
-[poetry.group.dev.dependencies]
-ruff = "^0.3.4"
+[tool.poetry.group.dev.dependencies]
 pre-commit = "^3.7.0"
 pytest = "^7.4.0"
+ruff = "^0.3.4"
 
 [build-system]
 requires = ["poetry-core"]
