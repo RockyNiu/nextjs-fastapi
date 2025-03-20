@@ -3,6 +3,7 @@ FROM python:3.11.4 AS dependencies
 WORKDIR /tmp
 COPY pyproject.toml poetry.lock* /tmp/
 RUN pip install poetry \
+&& poetry self add poetry-plugin-export \
 && poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 

@@ -12,8 +12,8 @@ This project is a fullstack template combining [Next.js](https://nextjs.org/) fo
 
 ## Prerequisites
 - Docker and Docker Compose installed on your system
-- Python 3.10 or higher installed on your system
-- Node.js and npm installed on your system
+- Python (^3.13.0) installed on your system
+- Node.js (^20.0) and npm installed on your system
 
 ## Quick Start
 - Clone the repository:
@@ -22,7 +22,7 @@ This project is a fullstack template combining [Next.js](https://nextjs.org/) fo
   git clone https://github.com/RockyNiu/nextjs-fastapi.git
   cd nextjs-fastapi
   ```
-- Follow the instructions in [backend/README.md](backend/README.md) for backend local setup.
+- Follow the instructions in [backend/README.md](backend/README.md) to add secret files in the folder `backend/config`
 - Start the application:
   ```bash
   cd docker
