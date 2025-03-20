@@ -1,4 +1,4 @@
-FROM python:3.11.4 AS dependencies
+FROM python:3.13.2 AS dependencies
 
 WORKDIR /tmp
 COPY pyproject.toml poetry.lock* /tmp/
@@ -7,7 +7,7 @@ RUN pip install poetry \
 && poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 
-FROM python:3.11.4 AS base
+FROM python:3.13.2 AS base
 
 WORKDIR /app
 COPY --from=dependencies /tmp/requirements.txt /app/requirements.txt
