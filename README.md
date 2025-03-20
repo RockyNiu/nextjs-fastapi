@@ -22,11 +22,11 @@ This project is a fullstack template combining [Next.js](https://nextjs.org/) fo
   git clone https://github.com/RockyNiu/nextjs-fastapi.git
   cd nextjs-fastapi
   ```
-
+- Follow the instructions in [backend/README.md](backend/README.md) for backend local setup.
 - Start the application:
   ```bash
   cd docker
-  docker-compose -f docker-compose.yml -f docker-compose-frontend.yml up -d --build
+  docker compose -f docker-compose.yml -f docker-compose-frontend.yml up -d --build
   ```
 
 - Open http://localhost:3000 in your browser to see the frontend.
@@ -38,11 +38,10 @@ This project is a fullstack template combining [Next.js](https://nextjs.org/) fo
   ```bash
   cd backend
   ```
-- Follow the instructions in [backend/README.md](backend/README.md) for local setup.
 - Start the backend in debug mode:
   ```bash
   cd ../docker
-  docker-compose -f docker-compose.yml -f docker-compose-debug.yml up -d
+  docker compose -f docker-compose.yml -f docker-compose-debug.yml up -d
   ```
 - Use Visual Studio Code to debug the backend.
   ```text
