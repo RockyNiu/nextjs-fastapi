@@ -5,6 +5,7 @@
   brew install pipx # install pipx.
   pipx install poetry # install poetry 
   brew install mysql # install mysql client.
+  poetry self add poetry-plugin-shell
   poetry shell # activate virtual environment, if not already activated.
   poetry lock # update poetry.lock file
   poetry install # install dependencies.
