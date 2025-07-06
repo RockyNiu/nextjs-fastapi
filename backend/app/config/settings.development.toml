@@ -1,4 +1,0 @@
-[MYSQL]
-host = "db"
-port = 3306
-dbname = "rockyniu"

@@ -30,9 +30,9 @@ class DatabaseManager:
     @classmethod
     def initialize(cls):
         if not cls._initialized:
-            config = ConfigLoader.get_config().mysql
-            cls.endpoint_url = f"mysql+mysqlconnector://{config.username}:{config.password}@{config.host}:{config.port}/{config.dbname}?charset=utf8mb4"
-            # Create the database engine. The connnection only happens the first time a task is performaed against the database.
+            config = ConfigLoader.get_config()
+            cls.endpoint_url = config.endpoint_url
+            # Create the database engine. The connection only happens the first time a task is performed against the database.
             cls.engine = create_engine(cls.endpoint_url, echo=True)
             cls._initialized = True
 

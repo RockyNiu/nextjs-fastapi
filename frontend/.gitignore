@@ -27,6 +27,10 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env
+.env.development
+.env.test
+.env.production
 
 # vercel
 .vercel
@@ -34,3 +38,28 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE files
+.vscode/*
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+temp_*
+
+# Package manager logs
+*.log
+
+# Storybook build outputs
+storybook-static/
