@@ -42,7 +42,7 @@ DB_USER=postgres
 DB_PASSWORD=password
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=ecpa_db
+DB_NAME=template_db
 
 # Application Configuration
 APP_HOST=0.0.0.0
@@ -63,7 +63,7 @@ just db-upgrade
 
 ### Local PostgreSQL
 1. Install PostgreSQL locally
-2. Create a database named `ecpa_db`
+2. Create a database named `template_db`
 3. Update `.env` with your credentials
 4. Run migrations: `just db-upgrade`
 

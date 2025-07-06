@@ -139,7 +139,7 @@ For more details, see [frontend/README.md](frontend/README.md).
 
 ## Project Structure
 ```text
-ecpa/
+nextjs-fastapi/
 ├── backend/
 │   ├── alembic/                    # Database migrations
 │   │   ├── versions/
@@ -222,7 +222,7 @@ DB_USER=postgres
 DB_PASSWORD=password
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=ecpa_db
+DB_NAME=template_db
 
 # Application Configuration
 APP_HOST=0.0.0.0
@@ -240,7 +240,7 @@ The project uses **PostgreSQL** as the primary database:
 
 2. **Local PostgreSQL:**
    - Install PostgreSQL locally
-   - Create a database named `ecpa_db`
+   - Create a database named `template_db`
    - Update `.env` with your local credentials
 
 3. **Run Migrations:**
