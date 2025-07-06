@@ -1,20 +1,18 @@
-version: '3.9'
 services:
   db:
     container_name: db
-    image: mysql:8
+    image: postgres:15
     restart: always
     environment:
-      MYSQL_DATABASE: rockyniu
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: root
+      POSTGRES_DB: ecpa_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
     ports:
-      - 3306:3306
+      - 5432:5432
     volumes:
-      - .mysql.cache:/var/lib/mysql
+      - .postgres.cache:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 30s
       retries: 3
@@ -32,4 +30,10 @@ services:
       - 8000:8000
     volumes:
       - ../backend:/app
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_NAME=ecpa_db
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000

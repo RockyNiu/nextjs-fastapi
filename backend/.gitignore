@@ -1,5 +1,21 @@
-# secret files
-.secrets.*
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Legacy TOML config files (no longer used)
+config/.secrets.*
+config/settings.*
+
+# Python environments
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -122,14 +138,41 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker volumes
+.postgres.cache/
+.mysql.cache/
+
+# IDE and editor files
+.vscode/*
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary test files
+test_*.py.bak
+temp_*
+*.tmp
+
+# Ruff cache
+.ruff_cache/
+
+# Alembic temporary files
+alembic/versions/.DS_Store
 
 # Spyder project settings
 .spyderproject

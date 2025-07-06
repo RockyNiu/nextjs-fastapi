@@ -3,17 +3,11 @@ import os
 from dataclasses import dataclass, fields
 from functools import lru_cache
 
-from dynaconf import Dynaconf
+from dotenv import load_dotenv
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-CONFIG_DIR = os.path.join(ROOT_DIR, "config")
+load_dotenv()
+
 BACKEND_ENV = os.getenv("BACKEND_ENV", "development")
-
-settings = Dynaconf(
-    envvar_prefix="BACKEND",
-    root_path=CONFIG_DIR,
-    settings_files=[f"settings.{BACKEND_ENV}.toml", f".secrets.{BACKEND_ENV}.toml"],
-)
 
 
 @dataclass
@@ -25,17 +19,33 @@ class BaseConfig:
 
 
 @dataclass
-class MySQLConfig(BaseConfig):
-    username: str
-    password: str
-    host: str
-    port: str
-    dbname: str
+class DBConfig(BaseConfig):
+    user: str | None = None
+    password: str | None = None
+    host: str | None = None
+    port: int = 5432
+    name: str = "ehs_soccer"
+    url: str | None = None
+
+    def __post_init__(self):
+        # If URL is not provided, construct it from the other parameters
+        if not self.url and self.user and self.password and self.host and self.name:
+            self.url = (
+                f"{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
+            )
+        if not self.url:
+            raise ValueError("Missing required configuration for db")
 
 
 @dataclass
 class AppConfig(BaseConfig):
-    mysql: MySQLConfig
+    db: DBConfig
+
+
+    @property 
+    def endpoint_url(self) -> str:
+        """Generate PostgreSQL endpoint URL for SQLAlchemy."""
+        return f"postgresql+psycopg2://{self.db.url}"
 
 
 class ConfigLoader:
@@ -48,7 +58,7 @@ class ConfigLoader:
         if not cls._config_initialized:
             try:
                 logging.debug("Loading configuration")
-                cls._load_config(settings=settings)
+                cls._load_config()
                 cls._config_initialized = True
             except Exception as error:
                 logging.critical(f"Error loading configuration: {error}")
@@ -56,12 +66,13 @@ class ConfigLoader:
         return cls.config
 
     @classmethod
-    def _load_config(cls, settings: Dynaconf):
-        mysql = MySQLConfig(
-            username=settings.mysql.username,
-            password=settings.mysql.password,
-            host=settings.mysql.host,
-            port=settings.mysql.port,
-            dbname=settings.mysql.dbname,
+    def _load_config(cls):
+        db = DBConfig(
+            user=os.getenv("DB_USER", "postgres"),
+            password=os.getenv("DB_PASSWORD", ""),
+            host=os.getenv("DB_HOST", "localhost"),
+            port=int(os.getenv("DB_PORT", "5432")),
+            name=os.getenv("DB_NAME", "ehs_soccer"),
+            url=os.getenv("DB_URL", None),
         )
-        cls.config = AppConfig(mysql=mysql)
+        cls.config = AppConfig(db=db)

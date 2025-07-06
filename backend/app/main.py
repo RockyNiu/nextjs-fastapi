@@ -6,7 +6,7 @@ from fastapi import APIRouter, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api.middleware import BaseMiddleware
+from app.api.middleware import BaseMiddleware, RequestInterceptorMiddleware
 from app.api.routers.item import ItemRouter
 
 app = FastAPI()
@@ -56,6 +56,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Add request interceptor for debugging (add this before BaseMiddleware)
+app.add_middleware(RequestInterceptorMiddleware)
 app.add_middleware(BaseMiddleware)
 
 RootRouter = APIRouter()

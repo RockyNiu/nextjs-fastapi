@@ -9,11 +9,10 @@ package-mode = false
 [tool.poetry.dependencies]
 python = "^3.10"
 alembic = "^1.13.1"
-dynaconf = "^3.2.5"
+python-dotenv = "^1.0.0"
 faker = "^25.6.0"
 fastapi = "^0.110.2"
-mysql-connector-python = "^8.3.0"
-mysqlclient = "^2.2.4"
+psycopg2-binary = "^2.9.9"
 sqlalchemy = "^2.0.29"
 sqlalchemy-utc = "^0.14.0"
 uvicorn = "^0.29.0"
@@ -22,7 +21,26 @@ uvicorn = "^0.29.0"
 pre-commit = "^3.7.0"
 pytest = "^7.4.0"
 ruff = "^0.3.4"
+httpx = "^0.28.1"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--disable-warnings",
+]
+markers = [
+    "unit: marks tests as unit tests",
+    "integration: marks tests as integration tests",
+    "slow: marks tests as slow running",
+]
+minversion = "6.0"

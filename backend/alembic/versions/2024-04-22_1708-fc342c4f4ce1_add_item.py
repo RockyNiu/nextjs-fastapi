@@ -8,7 +8,6 @@ Create Date: 2024-04-22 17:08:19.612062
 from typing import Sequence, Union
 
 import sqlalchemy as sa
-from sqlalchemy.dialects import mysql
 
 from alembic import op
 
@@ -22,9 +21,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     items = op.create_table(
         "items",
-        sa.Column(
-            "id", mysql.INTEGER(unsigned=True), autoincrement=True, nullable=False
-        ),
+        sa.Column("id", sa.INTEGER(), autoincrement=True, nullable=False),
         sa.Column("name", sa.VARCHAR(length=255), nullable=False),
         sa.Column(
             "date_created",
@@ -35,7 +32,7 @@ def upgrade() -> None:
         sa.Column(
             "date_updated",
             sa.DateTime(),
-            server_default=sa.text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+            server_default=sa.text("CURRENT_TIMESTAMP"),
             nullable=False,
         ),
         sa.PrimaryKeyConstraint("id"),
