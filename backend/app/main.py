@@ -7,7 +7,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.middleware import BaseMiddleware, RequestInterceptorMiddleware
-from app.api.routers.item import ItemRouter
 from app.api.routers.auth import router as AuthRouter
 
 app = FastAPI()
@@ -71,11 +70,10 @@ def read_root():
 
 @RootRouter.get("/random")
 def get_random():
-    items = ["item1", "item2", "item3", "item4"]  # Replace with your list of items
-    random_item = random.choice(items)
-    return random_item
+    options = ["option1", "option2", "option3", "option4"]
+    random_option = random.choice(options)
+    return random_option
 
 
 app.include_router(RootRouter)
 app.include_router(AuthRouter, prefix="/auth", tags=["Authentication"])
-app.include_router(ItemRouter)

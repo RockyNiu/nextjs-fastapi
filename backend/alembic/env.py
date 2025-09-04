@@ -7,7 +7,6 @@ from app.db.database import DatabaseManager
 from app.db.orm.base_orm import BaseORM
 # Import all ORM models so they are registered with metadata
 from app.db.orm.user_orm import UserORM
-from app.db.orm.item_orm import ItemORM
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -62,5 +62,4 @@ def db_session(test_session: Session) -> Session:
 
 
 pytest_plugins = [
-    "tests.utils.fixtures.item_conftest",
 ]

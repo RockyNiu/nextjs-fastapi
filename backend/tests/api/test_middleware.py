@@ -63,12 +63,12 @@ def test_middleware_handles_different_endpoints(client: TestClient) -> None:
 def test_middleware_handles_post_requests(client: TestClient) -> None:
     """Test middleware works with POST requests."""
     # Test a non-existent POST endpoint to avoid database dependencies
-    test_item = {
-        "name": "Test Item",
-        "description": "A test item for middleware testing",
+    test_data = {
+        "name": "Test Data",
+        "description": "Test data for middleware testing",
     }
 
-    response = client.post("/non-existent/", json=test_item)
+    response = client.post("/non-existent/", json=test_data)
 
     # Should have middleware headers even for non-existent endpoints
     assert "X-Process-Time" in response.headers

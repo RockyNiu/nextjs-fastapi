@@ -1,9 +1,7 @@
 from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from sqlalchemy.orm import Session
 
-from app.db.database import get_db
 from app.db.dao.user_dao import UserDAO
 from app.core.security import verify_token
 from app.entities.user import UserResponse
@@ -12,8 +10,7 @@ security = HTTPBearer()
 
 
 def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    db: Session = Depends(get_db)
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ) -> UserResponse:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -27,7 +24,7 @@ def get_current_user(
     if email is None:
         raise credentials_exception
     
-    user_dao = UserDAO(db)
+    user_dao = UserDAO()
     user = user_dao.get_by_email(email=email)
     
     if user is None:
@@ -48,8 +45,7 @@ def get_current_active_user(
 
 
 def get_optional_current_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
-    db: Session = Depends(get_db)
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
 ) -> Optional[UserResponse]:
     if not credentials:
         return None
@@ -60,7 +56,7 @@ def get_optional_current_user(
     if email is None:
         return None
     
-    user_dao = UserDAO(db)
+    user_dao = UserDAO()
     user = user_dao.get_by_email(email=email)
     
     if user is None:

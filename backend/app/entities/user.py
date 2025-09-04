@@ -22,9 +22,12 @@ class UserUpdate(BaseModel):
 
 class UserResponse(UserBase):
     id: int
-    created_at: datetime
-    updated_at: datetime
+    date_created: datetime
+    date_updated: datetime
     email_verified: bool = False
+    email_verification_token: Optional[str] = None
+    password_reset_token: Optional[str] = None
+    password_reset_expires: Optional[datetime] = None
 
     class Config:
         from_attributes = True

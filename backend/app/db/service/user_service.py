@@ -1,17 +1,15 @@
 from datetime import timedelta
 from typing import Optional
 from fastapi import HTTPException, status
-from sqlalchemy.orm import Session
 
 from app.db.dao.user_dao import UserDAO
 from app.entities.user import UserCreate, UserLogin, UserResponse, Token, ForgotPassword, PasswordReset
-from app.core.security import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, generate_email_verification_token
+from app.core.security import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
 
 
 class UserService:
-    def __init__(self, db: Session):
-        self.db = db
-        self.user_dao = UserDAO(db)
+    def __init__(self, user_dao: Optional[UserDAO] = None):
+        self.user_dao = user_dao or UserDAO()
 
     def register_user(self, user_create: UserCreate) -> UserResponse:
         # Check if user already exists
@@ -21,12 +19,8 @@ class UserService:
                 detail="Email already registered"
             )
         
-        # Create user
+        # Create user (email verification token is set in the DAO)
         db_user = self.user_dao.create_user(user_create)
-        
-        # Set email verification token
-        db_user.email_verification_token = generate_email_verification_token()
-        self.db.commit()
         
         # TODO: Send verification email here
         
@@ -71,7 +65,7 @@ class UserService:
             # Don't reveal if email exists or not
             return {"message": "If the email exists, a password reset link has been sent"}
         
-        token = self.user_dao.set_password_reset_token(user)
+        self.user_dao.set_password_reset_token(user)
         
         # TODO: Send password reset email here
         
