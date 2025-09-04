@@ -1,0 +1,28 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/backend",
+    "${workspaceFolder}/backend/app"
+  ],
+  "python.analysis.autoSearchPaths": true,
+  "python.analysis.autoImportCompletions": true,
+  "python.linting.enabled": true,
+  "python.linting.pylspEnabled": false,
+  "python.languageServer": "Pylance",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.terminal.activateEnvironment": true,
+  "python.terminal.activateEnvInCurrentTerminal": true,
+  "python.envFile": "${workspaceFolder}/backend/.env",
+  "files.associations": {
+    "*.py": "python"
+  },
+  "python.analysis.include": [
+    "${workspaceFolder}/backend/app",
+    "${workspaceFolder}/backend/tests"
+  ],
+  "python.analysis.stubPath": "${workspaceFolder}/backend/.venv/lib/python3.13/site-packages",
+  "python.linting.pycodestyleEnabled": false,
+  "python.linting.flake8Enabled": false,
+  "python.analysis.diagnosticMode": "workspace",
+  "python-envs.pythonProjects": []
+}
