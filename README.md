@@ -178,7 +178,7 @@ nextjs-fastapi/
 │   ├── .env.example               # Example environment file
 │   ├── alembic.ini
 │   ├── Dockerfile
-│   ├── poetry.lock
+│   ├── uv.lock
 │   ├── pyproject.toml
 │   ├── README.md
 │   └── ruff.toml

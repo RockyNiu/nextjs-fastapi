@@ -20,7 +20,7 @@ default:
 # Install all dependencies
 install:
     @echo "📦 Installing backend dependencies..."
-    cd {{backend_dir}} && poetry install
+    cd {{backend_dir}} && uv sync
     @echo "📦 Installing frontend dependencies..."
     cd {{frontend_dir}} && npm install
 
@@ -34,7 +34,7 @@ dev:
 # Start backend development server
 dev-backend:
     @echo "🐍 Starting FastAPI backend server..."
-    cd {{backend_dir}} && poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+    cd {{backend_dir}} && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 # Start frontend development server
 dev-frontend:
@@ -48,28 +48,28 @@ dev-frontend:
 # Run database migrations
 migrate:
     @echo "🗄️  Running database migrations..."
-    cd {{backend_dir}} && poetry run alembic upgrade head
+    cd {{backend_dir}} && uv run alembic upgrade head
 
 # Create a new migration
 migration message:
     @echo "📝 Creating new migration: {{message}}"
-    cd {{backend_dir}} && poetry run alembic revision --autogenerate -m "{{message}}"
+    cd {{backend_dir}} && uv run alembic revision --autogenerate -m "{{message}}"
 
 # Reset database (down and up)
 db-reset:
     @echo "♻️  Resetting database..."
-    cd {{backend_dir}} && poetry run alembic downgrade base
-    cd {{backend_dir}} && poetry run alembic upgrade head
+    cd {{backend_dir}} && uv run alembic downgrade base
+    cd {{backend_dir}} && uv run alembic upgrade head
 
 # Show migration history
 db-history:
     @echo "📜 Database migration history:"
-    cd {{backend_dir}} && poetry run alembic history
+    cd {{backend_dir}} && uv run alembic history
 
 # Show current database revision
 db-current:
     @echo "📍 Current database revision:"
-    cd {{backend_dir}} && poetry run alembic current
+    cd {{backend_dir}} && uv run alembic current
 
 # ============================================================================
 # Testing Commands
@@ -84,12 +84,12 @@ test:
 # Run backend tests
 test-backend:
     @echo "🐍 Running backend tests..."
-    cd {{backend_dir}} && poetry run pytest
+    cd {{backend_dir}} && uv run pytest
 
 # Run backend tests with coverage
 test-coverage:
     @echo "📊 Running backend tests with coverage..."
-    cd {{backend_dir}} && poetry run pytest --cov=app --cov-report=html --cov-report=term
+    cd {{backend_dir}} && uv run pytest --cov=app --cov-report=html --cov-report=term
 
 # Run frontend tests
 test-frontend:
@@ -109,8 +109,8 @@ format:
 # Format backend code
 format-backend:
     @echo "🐍 Formatting backend code..."
-    cd {{backend_dir}} && poetry run black .
-    cd {{backend_dir}} && poetry run isort .
+    cd {{backend_dir}} && uv run black .
+    cd {{backend_dir}} && uv run isort .
 
 # Format frontend code
 format-frontend:
@@ -126,8 +126,8 @@ lint:
 # Lint backend code
 lint-backend:
     @echo "🐍 Linting backend code..."
-    cd {{backend_dir}} && poetry run ruff check .
-    cd {{backend_dir}} && poetry run mypy .
+    cd {{backend_dir}} && uv run ruff check .
+    cd {{backend_dir}} && uv run mypy .
 
 # Lint frontend code
 lint-frontend:
@@ -137,7 +137,7 @@ lint-frontend:
 # Fix linting issues
 fix:
     @echo "🔧 Fixing linting issues..."
-    cd {{backend_dir}} && poetry run ruff check --fix .
+    cd {{backend_dir}} && uv run ruff check --fix .
     cd {{frontend_dir}} && npm run lint:fix
 
 # ============================================================================
@@ -191,7 +191,7 @@ status:
     @echo "Docker directory: {{docker_dir}}"
     @echo ""
     @echo "🐍 Backend dependencies:"
-    cd {{backend_dir}} && poetry show --only=main | head -10
+    cd {{backend_dir}} && uv pip list | head -10
     @echo ""
     @echo "⚛️  Frontend dependencies:"
     cd {{frontend_dir}} && npm list --depth=0 2>/dev/null | head -10 || echo "Run 'npm install' first"
@@ -199,13 +199,13 @@ status:
 # Update all dependencies
 update:
     @echo "⬆️  Updating dependencies..."
-    cd {{backend_dir}} && poetry update
+    cd {{backend_dir}} && uv lock --upgrade
     cd {{frontend_dir}} && npm update
 
 # Check for security vulnerabilities
 security:
     @echo "🔒 Checking for security vulnerabilities..."
-    cd {{backend_dir}} && poetry run safety check
+    cd {{backend_dir}} && uv run safety check
     cd {{frontend_dir}} && npm audit
 
 # Generate API documentation
@@ -229,12 +229,12 @@ setup:
 # Install pre-commit hooks
 hooks-install:
     @echo "🪝 Installing pre-commit hooks..."
-    cd {{backend_dir}} && poetry run pre-commit install
+    cd {{backend_dir}} && uv run pre-commit install
 
 # Run pre-commit hooks manually
 hooks-run:
     @echo "🪝 Running pre-commit hooks..."
-    cd {{backend_dir}} && poetry run pre-commit run --all-files
+    cd {{backend_dir}} && uv run pre-commit run --all-files
 
 # ============================================================================
 # Production Commands
@@ -244,9 +244,9 @@ hooks-run:
 build:
     @echo "🏗️  Building for production..."
     cd {{frontend_dir}} && npm run build
-    cd {{backend_dir}} && poetry build
+    cd {{backend_dir}} && uv build
 
 # Start production server (backend only)
 start:
     @echo "🚀 Starting production server..."
-    cd {{backend_dir}} && poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000
+    cd {{backend_dir}} && uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
