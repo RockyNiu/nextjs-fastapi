@@ -367,15 +367,6 @@ just docker-logs backend   # Check backend logs
 just docker-down           # Stop everything
 ```
 
-### Migration from Make
-
-The old `Makefile` has been replaced with a `justfile`. Key differences:
-
-- **Commands**: `make format` → `just format`
-- **Scope**: `just` commands work from the project root, not just backend/
-- **Features**: More commands available with better organization
-- **Cross-platform**: Better Windows support than Make
-
 ### Customization
 
 Edit the `justfile` in the project root to add new commands or modify existing ones.

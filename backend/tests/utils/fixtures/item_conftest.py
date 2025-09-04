@@ -17,7 +17,9 @@ def any_item_create() -> ItemCreate:
 def any_item() -> Item:
     faker = Faker()
     return Item(
-        id=faker.random_int(min=1000000, max=9999999),  # Use high numbers to avoid conflicts
+        id=faker.random_int(
+            min=1000000, max=9999999
+        ),  # Use high numbers to avoid conflicts
         name=faker.name(),
         date_created=faker.date_time(),
         date_updated=faker.date_time(),

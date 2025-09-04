@@ -41,8 +41,7 @@ class DBConfig(BaseConfig):
 class AppConfig(BaseConfig):
     db: DBConfig
 
-
-    @property 
+    @property
     def endpoint_url(self) -> str:
         """Generate PostgreSQL endpoint URL for SQLAlchemy."""
         return f"postgresql+psycopg2://{self.db.url}"

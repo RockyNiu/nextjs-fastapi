@@ -26,14 +26,14 @@ def test_engine() -> Generator[Engine, None, None]:
     config = ConfigLoader.get_config()
     # Use the main database URL for tests
     test_db_url = config.endpoint_url
-    
+
     engine = create_engine(test_db_url, echo=False)  # Disable echo in tests
-    
+
     # Ensure all tables exist (but don't drop/recreate)
     BaseORM.metadata.create_all(engine)
-    
+
     yield engine
-    
+
     # Clean up engine resources
     engine.dispose()
 
@@ -44,12 +44,12 @@ def test_session(test_engine: Engine) -> Generator[Session, None, None]:
     connection = test_engine.connect()
     transaction = connection.begin()
     session = Session(bind=connection)
-    
+
     # Set the test session as the current session
     current_database_session.set(session)
-    
+
     yield session
-    
+
     session.close()
     transaction.rollback()
     connection.close()

@@ -14,7 +14,10 @@ class RequestInterceptorMiddleware(BaseHTTPMiddleware):
     """
     Middleware to intercept and log HTTP requests and responses for debugging.
     """
-    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]):
+
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ):
         # Start timing
         start_time = time.time()
         request_id = str(uuid.uuid4())
@@ -71,7 +74,9 @@ class RequestInterceptorMiddleware(BaseHTTPMiddleware):
 
         logging.info(f"🔄 Incoming Request: {json.dumps(request_data, indent=2)}")
 
-    def _log_response(self, request: Request, response: Response, process_time: float, request_id: str):
+    def _log_response(
+        self, request: Request, response: Response, process_time: float, request_id: str
+    ):
         """Log outgoing response details."""
         response_data: dict[str, Any] = {
             "request_id": request_id,
@@ -84,8 +89,11 @@ class RequestInterceptorMiddleware(BaseHTTPMiddleware):
 
         logging.info(f"✅ Response: {json.dumps(response_data, indent=2)}")
 
+
 class BaseMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]):
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ):
         with database_context():
             try:
                 response = await call_next(request)

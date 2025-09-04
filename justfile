@@ -20,7 +20,7 @@ default:
 # Install all dependencies
 install:
     @echo "📦 Installing backend dependencies..."
-    cd {{backend_dir}} && uv sync
+    cd {{backend_dir}} && uv sync --extra dev
     @echo "📦 Installing frontend dependencies..."
     cd {{frontend_dir}} && npm install
 
@@ -109,8 +109,7 @@ format:
 # Format backend code
 format-backend:
     @echo "🐍 Formatting backend code..."
-    cd {{backend_dir}} && uv run black .
-    cd {{backend_dir}} && uv run isort .
+    cd {{backend_dir}} && uv run ruff format .
 
 # Format frontend code
 format-frontend:
@@ -147,17 +146,50 @@ fix:
 # Build all Docker images
 docker-build:
     @echo "🐳 Building Docker images..."
-    docker-compose -f {{docker_dir}}/docker-compose.yml build
+    just docker-build-backend
+    just docker-build-frontend
+
+# Build backend Docker image
+docker-build-backend:
+    @echo "🐳 Building backend Docker image..."
+    docker-compose -f {{docker_dir}}/docker-compose.yml build backend
+
+# Build frontend Docker image
+docker-build-frontend:
+    @echo "🐳 Building frontend Docker image..."
+    docker-compose -f {{docker_dir}}/docker-compose.yml -f {{docker_dir}}/docker-compose-frontend.yml build frontend
 
 # Start all services with Docker
 docker-up:
     @echo "🐳 Starting Docker services..."
+    just docker-up-backend
+    just docker-up-frontend
+
+# Start backend with Docker
+docker-up-backend:
+    @echo "🐳 Starting backend Docker services..."
     docker-compose -f {{docker_dir}}/docker-compose.yml up -d
+
+# Start frontend with Docker (requires backend to be running)
+docker-up-frontend:
+    @echo "🐳 Starting frontend Docker service..."
+    docker-compose -f {{docker_dir}}/docker-compose.yml -f {{docker_dir}}/docker-compose-frontend.yml up frontend -d
 
 # Stop all Docker services
 docker-down:
     @echo "🐳 Stopping Docker services..."
+    just docker-down-frontend
+    just docker-down-backend
+
+# Stop backend Docker services
+docker-down-backend:
+    @echo "🐳 Stopping backend Docker services..."
     docker-compose -f {{docker_dir}}/docker-compose.yml down
+
+# Stop frontend Docker service
+docker-down-frontend:
+    @echo "🐳 Stopping frontend Docker service..."
+    docker-compose -f {{docker_dir}}/docker-compose.yml -f {{docker_dir}}/docker-compose-frontend.yml stop frontend
 
 # View Docker logs
 docker-logs service="":
