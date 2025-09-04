@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.middleware import BaseMiddleware, RequestInterceptorMiddleware
 from app.api.routers.item import ItemRouter
+from app.api.routers.auth import router as AuthRouter
 
 app = FastAPI()
 
@@ -76,4 +77,5 @@ def get_random():
 
 
 app.include_router(RootRouter)
+app.include_router(AuthRouter, prefix="/auth", tags=["Authentication"])
 app.include_router(ItemRouter)

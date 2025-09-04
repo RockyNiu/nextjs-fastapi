@@ -40,6 +40,7 @@ class DBConfig(BaseConfig):
 @dataclass
 class AppConfig(BaseConfig):
     db: DBConfig
+    secret_key: str
 
     @property
     def endpoint_url(self) -> str:
@@ -74,4 +75,7 @@ class ConfigLoader:
             name=os.getenv("DB_NAME", "ehs_soccer"),
             url=os.getenv("DB_URL", None),
         )
-        cls.config = AppConfig(db=db)
+        cls.config = AppConfig(
+            db=db,
+            secret_key=os.getenv("SECRET_KEY", "your-secret-key-here-change-in-production")
+        )
