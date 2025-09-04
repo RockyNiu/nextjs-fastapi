@@ -20,7 +20,7 @@ default:
 # Install all dependencies
 install:
     @echo "📦 Installing backend dependencies..."
-    cd {{backend_dir}} && uv sync --extra dev
+    cd {{backend_dir}} && uv sync --all-extras
     @echo "📦 Installing frontend dependencies..."
     cd {{frontend_dir}} && npm install
 
