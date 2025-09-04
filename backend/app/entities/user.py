@@ -20,7 +20,7 @@ class UserUpdate(BaseModel):
     is_active: Optional[bool] = None
 
 
-class UserResponse(UserBase):
+class User(UserBase):
     id: int
     date_created: datetime
     date_updated: datetime

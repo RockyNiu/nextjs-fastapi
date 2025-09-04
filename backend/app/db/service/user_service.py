@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import HTTPException, status
 
 from app.db.dao.user_dao import UserDAO
-from app.entities.user import UserCreate, UserLogin, UserResponse, Token, ForgotPassword, PasswordReset
+from app.entities.user import UserCreate, UserLogin, User, Token, ForgotPassword, PasswordReset
 from app.core.security import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
 
 
@@ -11,7 +11,7 @@ class UserService:
     def __init__(self, user_dao: Optional[UserDAO] = None):
         self.user_dao = user_dao or UserDAO()
 
-    def register_user(self, user_create: UserCreate) -> UserResponse:
+    def register_user(self, user_create: UserCreate) -> User:
         # Check if user already exists
         if self.user_dao.get_by_email(user_create.email):
             raise HTTPException(
@@ -24,7 +24,7 @@ class UserService:
         
         # TODO: Send verification email here
         
-        return UserResponse.model_validate(db_user)
+        return User.model_validate(db_user)
 
     def authenticate_user(self, user_login: UserLogin) -> Token:
         user = self.user_dao.authenticate(user_login.email, user_login.password)
@@ -53,10 +53,10 @@ class UserService:
             expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60  # Convert to seconds
         )
 
-    def get_user_by_email(self, email: str) -> Optional[UserResponse]:
+    def get_user_by_email(self, email: str) -> Optional[User]:
         user = self.user_dao.get_by_email(email)
         if user:
-            return UserResponse.model_validate(user)
+            return User.model_validate(user)
         return None
 
     def forgot_password(self, forgot_password: ForgotPassword) -> dict:
@@ -65,7 +65,7 @@ class UserService:
             # Don't reveal if email exists or not
             return {"message": "If the email exists, a password reset link has been sent"}
         
-        self.user_dao.set_password_reset_token(user)
+        self.user_dao.set_password_reset_token(forgot_password.email)
         
         # TODO: Send password reset email here
         

@@ -28,7 +28,7 @@ def verify_token(token: str) -> Optional[str]:
     try:
         config = ConfigLoader.get_config()
         payload = jwt.decode(token, config.secret_key, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
+        email = payload.get("sub")
         if email is None:
             return None
         return email

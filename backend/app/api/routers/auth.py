@@ -5,7 +5,7 @@ from app.db.service.user_service import UserService
 from app.entities.user import (
     UserCreate, 
     UserLogin, 
-    UserResponse, 
+    User, 
     Token, 
     ForgotPassword, 
     PasswordReset
@@ -15,7 +15,7 @@ from app.core.deps import get_current_active_user
 router = APIRouter()
 
 
-@router.post("/register", response_model=UserResponse)
+@router.post("/register", response_model=User)
 def register(
     user_create: UserCreate
 ) -> Any:
@@ -70,9 +70,9 @@ def verify_email(
     return user_service.verify_email(token)
 
 
-@router.get("/me", response_model=UserResponse)
+@router.get("/me", response_model=User)
 def read_user_me(
-    current_user: UserResponse = Depends(get_current_active_user)
+    current_user: User = Depends(get_current_active_user)
 ) -> Any:
     """
     Get current user.

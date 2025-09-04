@@ -59,7 +59,3 @@ def test_session(test_engine: Engine) -> Generator[Session, None, None]:
 def db_session(test_session: Session) -> Session:
     """Alias for test_session for easier use in tests."""
     return test_session
-
-
-pytest_plugins = [
-]
