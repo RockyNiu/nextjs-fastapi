@@ -1,10 +1,11 @@
 """Add Item
 
 Revision ID: fc342c4f4ce1
-Revises: 
+Revises:
 Create Date: 2024-04-22 17:08:19.612062
 
 """
+
 from typing import Sequence, Union
 
 import sqlalchemy as sa

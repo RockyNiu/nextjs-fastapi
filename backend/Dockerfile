@@ -1,17 +1,19 @@
-FROM python:3.13.2 AS dependencies
+FROM python:3.13.2
 
-WORKDIR /tmp
-COPY pyproject.toml poetry.lock* /tmp/
-RUN pip install poetry \
-&& poetry self add poetry-plugin-export \
-&& poetry export -f requirements.txt --output requirements.txt --without-hashes
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
-
-FROM python:3.13.2 AS base
-
+# Change the working directory to the `app` directory
 WORKDIR /app
-COPY --from=dependencies /tmp/requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+
+# Copy the project requirements
+COPY pyproject.toml uv.lock /app/
+
+# Install dependencies
+RUN uv sync --frozen --no-cache --no-dev
+
+# Copy the rest of the application
 COPY . /app
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the application
+CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

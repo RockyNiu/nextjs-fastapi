@@ -178,7 +178,7 @@ nextjs-fastapi/
 │   ├── .env.example               # Example environment file
 │   ├── alembic.ini
 │   ├── Dockerfile
-│   ├── poetry.lock
+│   ├── uv.lock
 │   ├── pyproject.toml
 │   ├── README.md
 │   └── ruff.toml
@@ -366,15 +366,6 @@ just docker-up             # Start services
 just docker-logs backend   # Check backend logs
 just docker-down           # Stop everything
 ```
-
-### Migration from Make
-
-The old `Makefile` has been replaced with a `justfile`. Key differences:
-
-- **Commands**: `make format` → `just format`
-- **Scope**: `just` commands work from the project root, not just backend/
-- **Features**: More commands available with better organization
-- **Cross-platform**: Better Windows support than Make
 
 ### Customization
 
