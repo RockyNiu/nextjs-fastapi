@@ -95,11 +95,8 @@ The backend uses **PostgreSQL** as the database and **just** for task automation
 
 #### Key Development Commands
 ```bash
-# IDE-safe installation (recommended for daily use)
+# Install
 just install
-
-# Full installation with all extras (may break IDE)
-just install-full
 
 # Start backend development server
 just dev-backend

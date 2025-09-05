@@ -17,15 +17,7 @@ default:
 # Development Commands
 # ============================================================================
 
-# Install all dependencies (IDE-safe)
 install:
-    @echo "📦 Installing backend dependencies..."
-    cd {{backend_dir}} && uv sync --no-progress --frozen
-    @echo "📦 Installing frontend dependencies..."
-    cd {{frontend_dir}} && npm install
-
-# Full install with all extras (may break IDE)
-install-full:
     @echo "📦 Installing ALL backend dependencies (may break IDE)..."
     cd {{backend_dir}} && uv sync --all-extras
     @echo "📦 Installing frontend dependencies..."
