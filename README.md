@@ -190,11 +190,19 @@ This template includes a complete user authentication system:
 - `GET /auth/me` - Get current user profile
 
 ### Frontend Components
-- **LoginForm** - User login interface
+- **LoginForm** - User login interface with forgot password link
 - **RegisterForm** - User registration with validation
-- **ForgotPasswordForm** - Password reset request
+- **ForgotPasswordForm** - Password reset request form
+- **ResetPasswordForm** - Password reset with token validation
 - **UserProfile** - User dashboard and profile display
 - **Layout/Header** - Navigation with authentication state
+
+### Frontend Routes
+- `/login` - User login page
+- `/register` - User registration page
+- `/forgot-password` - Password reset request page
+- `/auth/reset-password?token=<token>` - Password reset form with token
+- `/dashboard` - Protected user dashboard
 
 ### Features
 - **JWT Authentication** - Secure token-based authentication
@@ -292,6 +300,14 @@ DB_PASSWORD=password
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=template_db
+
+# Email Configuration (for password reset, verification)
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password-here
+MAIL_FROM=your-email@gmail.com
+MAIL_PORT=587
+MAIL_SERVER=smtp.gmail.com
+FRONTEND_URL=http://localhost:3000
 
 # Application Configuration
 APP_HOST=0.0.0.0

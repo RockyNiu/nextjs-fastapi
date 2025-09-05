@@ -11,7 +11,6 @@
     ],
     "python.analysis.extraPaths": [
         "./backend",
-        "./backend/app"
     ],
     "python-envs.defaultEnvManager": "ms-python.python:venv",
     "python-envs.pythonProjects": []

@@ -92,11 +92,11 @@ class ConfigLoader:
             url=os.getenv("DB_URL", None),
         )
         email = EmailConfig(
-            username=os.getenv("EMAIL_USERNAME", ""),
-            password=os.getenv("EMAIL_PASSWORD", ""),
-            from_address=os.getenv("EMAIL_FROM_ADDRESS", ""),
-            port=int(os.getenv("EMAIL_PORT", "587")),
-            server=os.getenv("EMAIL_SERVER", "smtp.gmail.com"),
+            username=os.getenv("MAIL_USERNAME", ""),
+            password=os.getenv("MAIL_PASSWORD", ""),
+            from_address=os.getenv("MAIL_FROM", ""),
+            port=int(os.getenv("MAIL_PORT", "587")),
+            server=os.getenv("MAIL_SERVER", "smtp.gmail.com"),
             frontend_url=os.getenv("FRONTEND_URL", "http://localhost:3000"),
         )
         cls.config = AppConfig(

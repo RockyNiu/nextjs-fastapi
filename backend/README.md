@@ -45,11 +45,11 @@ DB_PORT=5432
 DB_NAME=template_db
 
 # Email Configuration
-EMAIL_USERNAME=your-email@gmail.com
-EMAIL_PASSWORD=your-app-password-here
-EMAIL_FROM_ADDRESS=your-email@gmail.com
-EMAIL_PORT=587
-EMAIL_SERVER=smtp.gmail.com
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password-here
+MAIL_FROM=your-email@gmail.com
+MAIL_PORT=587
+MAIL_SERVER=smtp.gmail.com
 FRONTEND_URL=http://localhost:3000
 
 # Application Configuration
@@ -77,9 +77,9 @@ To use Gmail for sending emails (password reset, verification, etc.), you need t
 
 3. **Update your `.env` file**:
    ```bash
-   EMAIL_USERNAME=your-email@gmail.com
-   EMAIL_PASSWORD=your-16-character-app-password  # NOT your regular Gmail password
-   EMAIL_FROM_ADDRESS=your-email@gmail.com
+   MAIL_USERNAME=your-email@gmail.com
+   MAIL_PASSWORD=your-16-character-app-password  # NOT your regular Gmail password
+   MAIL_FROM=your-email@gmail.com
    ```
 
 #### Important Notes:
@@ -90,9 +90,9 @@ To use Gmail for sending emails (password reset, verification, etc.), you need t
 
 #### Alternative Email Providers:
 If you prefer not to use Gmail, you can configure other SMTP providers by updating:
-- `EMAIL_SERVER`: SMTP server address
-- `EMAIL_PORT`: SMTP port (usually 587 for TLS)
-- `EMAIL_USERNAME` and `EMAIL_PASSWORD`: Your credentials
+- `MAIL_SERVER`: SMTP server address
+- `MAIL_PORT`: SMTP port (usually 587 for TLS)
+- `MAIL_USERNAME` and `MAIL_PASSWORD`: Your credentials
 ```
 
 ## Database Setup
