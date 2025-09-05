@@ -44,10 +44,55 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=template_db
 
+# Email Configuration
+EMAIL_USERNAME=your-email@gmail.com
+EMAIL_PASSWORD=your-app-password-here
+EMAIL_FROM_ADDRESS=your-email@gmail.com
+EMAIL_PORT=587
+EMAIL_SERVER=smtp.gmail.com
+FRONTEND_URL=http://localhost:3000
+
 # Application Configuration
 APP_HOST=0.0.0.0
 APP_PORT=8000
 APP_ENV=development
+```
+
+### Gmail Configuration for Email Service
+
+To use Gmail for sending emails (password reset, verification, etc.), you need to set up an App Password:
+
+#### Step-by-Step Instructions:
+
+1. **Enable 2-Factor Authentication** (required for App Passwords):
+   - Go to [Google Account Settings](https://myaccount.google.com/)
+   - Navigate to "Security" → "2-Step Verification"
+   - Follow the setup instructions
+
+2. **Generate an App Password**:
+   - Go to [Google Account Settings](https://myaccount.google.com/)
+   - Navigate to "Security" → "2-Step Verification" → "App passwords"
+   - Select "Mail" as the app and your device
+   - Copy the 16-character password generated
+
+3. **Update your `.env` file**:
+   ```bash
+   EMAIL_USERNAME=your-email@gmail.com
+   EMAIL_PASSWORD=your-16-character-app-password  # NOT your regular Gmail password
+   EMAIL_FROM_ADDRESS=your-email@gmail.com
+   ```
+
+#### Important Notes:
+- **Never use your regular Gmail password** - only use the App Password
+- Keep your App Password secure and don't commit it to version control
+- For production, consider using dedicated email services like SendGrid or AWS SES
+- If you don't have 2FA enabled, you cannot create App Passwords
+
+#### Alternative Email Providers:
+If you prefer not to use Gmail, you can configure other SMTP providers by updating:
+- `EMAIL_SERVER`: SMTP server address
+- `EMAIL_PORT`: SMTP port (usually 587 for TLS)
+- `EMAIL_USERNAME` and `EMAIL_PASSWORD`: Your credentials
 ```
 
 ## Database Setup

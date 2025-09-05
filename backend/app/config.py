@@ -38,8 +38,24 @@ class DBConfig(BaseConfig):
 
 
 @dataclass
+class EmailConfig(BaseConfig):
+    username: str = ""
+    password: str = ""
+    from_address: str = ""
+    port: int = 587
+    server: str = "smtp.gmail.com"
+    frontend_url: str = "http://localhost:3000"
+
+    def __post_init__(self):
+        # Only validate if we're not in testing mode
+        # In production, these should be required
+        pass
+
+
+@dataclass
 class AppConfig(BaseConfig):
     db: DBConfig
+    email: EmailConfig
     secret_key: str
 
     @property
@@ -75,8 +91,17 @@ class ConfigLoader:
             name=os.getenv("DB_NAME", "ehs_soccer"),
             url=os.getenv("DB_URL", None),
         )
+        email = EmailConfig(
+            username=os.getenv("EMAIL_USERNAME", ""),
+            password=os.getenv("EMAIL_PASSWORD", ""),
+            from_address=os.getenv("EMAIL_FROM_ADDRESS", ""),
+            port=int(os.getenv("EMAIL_PORT", "587")),
+            server=os.getenv("EMAIL_SERVER", "smtp.gmail.com"),
+            frontend_url=os.getenv("FRONTEND_URL", "http://localhost:3000"),
+        )
         cls.config = AppConfig(
             db=db,
+            email=email,
             secret_key=os.getenv(
                 "SECRET_KEY", "your-secret-key-here-change-in-production"
             ),
