@@ -1,4 +1,18 @@
 {
-    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "python.terminal.activateEnvironment": true,
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.autoSearchPaths": true,
+    "python.analysis.indexing": true,
+    "python.analysis.packageIndexDepths": [
+        {
+            "name": "app",
+            "depth": 10
+        }
+    ],
+    "python.analysis.extraPaths": [
+        "./backend",
+        "./backend/app"
+    ],
+    "python-envs.defaultEnvManager": "ms-python.python:venv",
     "python-envs.pythonProjects": []
 }

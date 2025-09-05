@@ -13,7 +13,6 @@ from app.api.entities.user_api import (
     UserLoginAPI,
 )
 from app.core.deps import get_current_active_user
-from app.db.service.user_service import UserService
 from app.entities.user import (
     ForgotPassword,
     PasswordReset,
@@ -21,6 +20,7 @@ from app.entities.user import (
     UserCreate,
     UserLogin,
 )
+from app.service.user_service import UserService
 
 router = APIRouter()
 
@@ -58,7 +58,6 @@ def register(user_create_api: UserCreateAPI) -> Any:
     user_service = UserService()
     user = user_service.register_user(user_create)
 
-    # Convert internal model to API response model
     return UserAPI.model_validate(user)
 
 
