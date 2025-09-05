@@ -145,6 +145,7 @@ After running `just install-full`, your IDE might lose connection to the Python 
    - The configuration is pre-configured in `.vscode/launch.json`
    - Set breakpoints in your Python code
    - Press F5 to start debugging
+   - **Note**: Debugpy is installed automatically when using debug mode
 
 ### Frontend Development
 1. **Navigate to the frontend directory:**

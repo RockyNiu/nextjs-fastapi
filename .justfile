@@ -18,23 +18,13 @@ default:
 # ============================================================================
 
 install:
-    @echo "📦 Installing ALL backend dependencies (may break IDE)..."
+    @echo "📦 Syncing backend dependencies..."
     cd {{backend_dir}} && uv sync --all-extras
     @echo "📦 Installing frontend dependencies..."
     cd {{frontend_dir}} && npm install
+    @echo "📋 Updating requirements files..."
+    just update-requirements
     @echo "💡 IDE Python interpreter path: {{backend_dir}}/.venv/bin/python"
-
-# Start the development servers
-dev:
-    @echo "🚀 Starting development servers..."
-    just dev-backend &
-    just dev-frontend &
-    wait
-
-# Start backend development server
-dev-backend:
-    @echo "🐍 Starting FastAPI backend server..."
-    cd {{backend_dir}} && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 # Start frontend development server
 dev-frontend:
@@ -109,36 +99,13 @@ format:
 # Format backend code
 format-backend:
     @echo "🐍 Formatting backend code..."
-    cd {{backend_dir}} && uv run ruff check --fix .
-    cd {{backend_dir}} && uv run ruff format .
+    cd {{backend_dir}} && uv run --frozen ruff check --fix .
+    cd {{backend_dir}} && uv run --frozen ruff format .
 
 # Format frontend code
 format-frontend:
     @echo "⚛️  Formatting frontend code..."
     cd {{frontend_dir}} && npm run format
-
-# Lint all code
-lint:
-    @echo "🔍 Linting code..."
-    just lint-backend
-    just lint-frontend
-
-# Lint backend code
-lint-backend:
-    @echo "🐍 Linting backend code..."
-    cd {{backend_dir}} && uv run ruff check .
-    cd {{backend_dir}} && uv run mypy .
-
-# Lint frontend code
-lint-frontend:
-    @echo "⚛️  Linting frontend code..."
-    cd {{frontend_dir}} && npm run lint
-
-# Fix linting issues
-fix:
-    @echo "🔧 Fixing linting issues..."
-    cd {{backend_dir}} && uv run ruff check --fix .
-    cd {{frontend_dir}} && npm run lint:fix
 
 # ============================================================================
 # Docker Commands
@@ -150,64 +117,10 @@ docker +args='':
 docker-debug +args='':
     docker-compose -f {{docker_dir}}/docker-compose.yml -f {{docker_dir}}/docker-compose-debug.yml -f {{docker_dir}}/docker-compose-frontend.yml {{args}}
 
-# Build all Docker images
-docker-build:
-    @echo "🐳 Building Docker images..."
-    just docker-build-backend
-    just docker-build-frontend
-
-# Build backend Docker image
-docker-build-backend:
-    @echo "🐳 Building backend Docker image..."
-    docker-compose -f {{docker_dir}}/docker-compose.yml build backend
-
-# Build frontend Docker image
-docker-build-frontend:
-    @echo "🐳 Building frontend Docker image..."
-    docker-compose -f {{docker_dir}}/docker-compose.yml -f {{docker_dir}}/docker-compose-frontend.yml build frontend
-
-# Start all services with Docker
-docker-up:
-    @echo "🐳 Starting Docker services..."
-    just docker-up-backend
-    just docker-up-frontend
-
-# Start backend with Docker
-docker-up-backend:
-    @echo "🐳 Starting backend Docker services..."
-    docker-compose -f {{docker_dir}}/docker-compose.yml up -d
-
-# Start frontend with Docker (requires backend to be running)
-docker-up-frontend:
-    @echo "🐳 Starting frontend Docker service..."
-    docker-compose -f {{docker_dir}}/docker-compose.yml -f {{docker_dir}}/docker-compose-frontend.yml up frontend -d
-
-# Stop all Docker services
-docker-down:
-    @echo "🐳 Stopping Docker services..."
-    just docker-down-frontend
-    just docker-down-backend
-
-# Stop backend Docker services
-docker-down-backend:
-    @echo "🐳 Stopping backend Docker services..."
-    docker-compose -f {{docker_dir}}/docker-compose.yml down
-
-# Stop frontend Docker service
-docker-down-frontend:
-    @echo "🐳 Stopping frontend Docker service..."
-    docker-compose -f {{docker_dir}}/docker-compose.yml -f {{docker_dir}}/docker-compose-frontend.yml stop frontend
-
 # View Docker logs
-docker-logs service="":
+docker-logs +args='':
     @echo "📋 Viewing Docker logs..."
-    docker-compose -f {{docker_dir}}/docker-compose.yml logs {{service}}
-
-# Restart Docker services
-docker-restart:
-    @echo "♻️  Restarting Docker services..."
-    just docker-down
-    just docker-up
+    docker-compose -f {{docker_dir}}/docker-compose.yml logs {{args}} 
 
 # ============================================================================
 # Utility Commands
@@ -241,6 +154,13 @@ update:
     cd {{backend_dir}} && uv lock --upgrade
     cd {{backend_dir}} && uv sync --no-progress --frozen
     cd {{frontend_dir}} && npm update
+
+# Update requirements files
+update-requirements:
+    @echo "📋 Updating requirements files..."
+    cd {{backend_dir}} && uv export --no-dev --format requirements-txt --no-hashes --no-emit-project > requirements.txt
+    cd {{backend_dir}} && uv export --format requirements-txt --no-hashes --no-emit-project > requirements-dev.txt
+    @echo "✅ Requirements files updated!"
 
 # Force update and sync all (may break IDE)
 update-full:
@@ -283,18 +203,3 @@ hooks-install:
 hooks-run:
     @echo "🪝 Running pre-commit hooks..."
     cd {{backend_dir}} && uv run pre-commit run --all-files
-
-# ============================================================================
-# Production Commands
-# ============================================================================
-
-# Build for production
-build:
-    @echo "🏗️  Building for production..."
-    cd {{frontend_dir}} && npm run build
-    cd {{backend_dir}} && uv build
-
-# Start production server (backend only)
-start:
-    @echo "🚀 Starting production server..."
-    cd {{backend_dir}} && uv run uvicorn app.main:app --host 0.0.0.0 --port 8000

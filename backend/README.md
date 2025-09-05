@@ -174,6 +174,7 @@ alembic downgrade -1
 
 2. Use the "Backend: debug in docker" launch configuration in VS Code
 3. Set breakpoints and press F5 to start debugging
+   - **Note**: Debugpy is installed automatically when using debug mode
 
 ## Optional
 ```bash
