@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { authService } from '@/services/authService';
 import { UserLoginAPI } from '@/types/api';
+import { useState } from 'react';
 
 interface LoginFormProps {
   onSuccess?: (user: any) => void;
@@ -25,7 +25,7 @@ export default function LoginForm({ onSuccess, onError }: LoginFormProps) {
     try {
       const tokenResponse = await authService.login(formData);
       const user = await authService.getCurrentUser();
-      
+
       if (onSuccess) {
         onSuccess(user);
       }
@@ -41,9 +41,9 @@ export default function LoginForm({ onSuccess, onError }: LoginFormProps) {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -52,10 +52,13 @@ export default function LoginForm({ onSuccess, onError }: LoginFormProps) {
       <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
         Sign In
       </h2>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Email
           </label>
           <input
@@ -71,7 +74,10 @@ export default function LoginForm({ onSuccess, onError }: LoginFormProps) {
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Password
           </label>
           <input

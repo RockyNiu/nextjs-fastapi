@@ -1,8 +1,8 @@
 import json
 import logging
 import time
-from typing import Callable, Awaitable, Any
 import uuid
+from typing import Any, Awaitable, Callable
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -52,8 +52,11 @@ class RequestInterceptorMiddleware(BaseHTTPMiddleware):
             "request_id": request_id,
             "method": request.method,
             "url": str(request.url),
-            "headers": {k: v for k, v in dict(request.headers).items() 
-                       if k.lower() not in ['authorization', 'cookie']},  # Hide sensitive headers
+            "headers": {
+                k: v
+                for k, v in dict(request.headers).items()
+                if k.lower() not in ["authorization", "cookie"]
+            },  # Hide sensitive headers
             "client": f"{request.client.host}:{request.client.port}"
             if request.client
             else "unknown",

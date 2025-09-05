@@ -77,5 +77,7 @@ class ConfigLoader:
         )
         cls.config = AppConfig(
             db=db,
-            secret_key=os.getenv("SECRET_KEY", "your-secret-key-here-change-in-production")
+            secret_key=os.getenv(
+                "SECRET_KEY", "your-secret-key-here-change-in-production"
+            ),
         )

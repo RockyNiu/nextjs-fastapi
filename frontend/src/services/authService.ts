@@ -1,13 +1,13 @@
-import { apiService } from './apiRequest';
 import {
+  ForgotPasswordAPI,
+  MessageResponseAPI,
+  PasswordResetAPI,
+  TokenResponseAPI,
+  UserAPI,
   UserCreateAPI,
   UserLoginAPI,
-  UserAPI,
-  TokenResponseAPI,
-  ForgotPasswordAPI,
-  PasswordResetAPI,
-  MessageResponseAPI,
 } from '@/types/api';
+import { apiService } from './apiRequest';
 
 class AuthService {
   async register(userData: UserCreateAPI): Promise<UserAPI> {
@@ -25,14 +25,14 @@ class AuthService {
       method: 'POST',
       data: credentials,
     });
-    
+
     // Store token in localStorage
     if (typeof window !== 'undefined') {
       localStorage.setItem('access_token', response.data.accessToken);
       localStorage.setItem('token_type', response.data.tokenType);
       localStorage.setItem('expires_in', response.data.expiresIn.toString());
     }
-    
+
     return response.data;
   }
 
@@ -43,10 +43,10 @@ class AuthService {
         method: 'POST',
         requiresAuth: true,
       });
-      
+
       // Clear token from localStorage
       this.clearTokens();
-      
+
       return response.data;
     } catch (error) {
       // Clear tokens even if API call fails
@@ -73,7 +73,9 @@ class AuthService {
     return response.data;
   }
 
-  async resetPassword(resetData: PasswordResetAPI): Promise<MessageResponseAPI> {
+  async resetPassword(
+    resetData: PasswordResetAPI
+  ): Promise<MessageResponseAPI> {
     const response = await apiService.request<MessageResponseAPI>({
       endpoint: '/auth/reset-password',
       method: 'POST',

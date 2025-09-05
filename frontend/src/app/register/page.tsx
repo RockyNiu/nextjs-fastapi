@@ -1,8 +1,8 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import Layout from '@/components/layout/Layout';
 import RegisterForm from '@/components/auth/RegisterForm';
+import Layout from '@/components/layout/Layout';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -14,7 +14,7 @@ export default function RegisterPage() {
   return (
     <Layout>
       <div className="max-w-md mx-auto">
-        <RegisterForm 
+        <RegisterForm
           onSuccess={handleSuccess}
           onError={(error) => console.error('Registration error:', error)}
         />

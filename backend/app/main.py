@@ -6,8 +6,7 @@ from fastapi import APIRouter, FastAPI, HTTPException, Request, status
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse

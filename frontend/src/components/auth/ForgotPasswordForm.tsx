@@ -1,15 +1,18 @@
 'use client';
 
-import { useState } from 'react';
 import { authService } from '@/services/authService';
 import { ForgotPasswordAPI } from '@/types/api';
+import { useState } from 'react';
 
 interface ForgotPasswordFormProps {
   onSuccess?: (message: string) => void;
   onError?: (error: string) => void;
 }
 
-export default function ForgotPasswordForm({ onSuccess, onError }: ForgotPasswordFormProps) {
+export default function ForgotPasswordForm({
+  onSuccess,
+  onError,
+}: ForgotPasswordFormProps) {
   const [formData, setFormData] = useState<ForgotPasswordAPI>({
     email: '',
   });
@@ -26,12 +29,13 @@ export default function ForgotPasswordForm({ onSuccess, onError }: ForgotPasswor
     try {
       const response = await authService.forgotPassword(formData);
       setSuccess(response.message);
-      
+
       if (onSuccess) {
         onSuccess(response.message);
       }
     } catch (err: any) {
-      const errorMessage = err.detail || err.error || 'Failed to send reset email';
+      const errorMessage =
+        err.detail || err.error || 'Failed to send reset email';
       setError(errorMessage);
       if (onError) {
         onError(errorMessage);
@@ -42,9 +46,9 @@ export default function ForgotPasswordForm({ onSuccess, onError }: ForgotPasswor
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -53,14 +57,18 @@ export default function ForgotPasswordForm({ onSuccess, onError }: ForgotPasswor
       <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
         Reset Password
       </h2>
-      
+
       <p className="text-gray-600 text-sm mb-6 text-center">
-        Enter your email address and we'll send you a link to reset your password.
+        Enter your email address and we'll send you a link to reset your
+        password.
       </p>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Email Address
           </label>
           <input

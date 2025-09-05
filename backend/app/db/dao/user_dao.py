@@ -1,12 +1,18 @@
-from typing import Optional
 from datetime import datetime, timedelta, timezone
-from sqlalchemy.orm import Session
-from sqlalchemy import and_, select
+from typing import Optional
 
+from sqlalchemy import and_, select
+from sqlalchemy.orm import Session
+
+from app.core.security import (
+    generate_email_verification_token,
+    generate_password_reset_token,
+    get_password_hash,
+    verify_password,
+)
 from app.db.dao.base_dao import BaseDAO
 from app.db.orm.user_orm import UserORM
-from app.entities.user import UserCreate, User
-from app.core.security import get_password_hash, verify_password, generate_password_reset_token, generate_email_verification_token
+from app.entities.user import User, UserCreate
 
 
 class UserDAO(BaseDAO):
@@ -49,36 +55,44 @@ class UserDAO(BaseDAO):
         user_orm = self.session.query(UserORM).filter(UserORM.email == email).first()
         if not user_orm:
             raise ValueError(f"User with email {email} not found")
-        
+
         token = generate_password_reset_token()
         user_orm.password_reset_token = token  # type: ignore
-        user_orm.password_reset_expires = datetime.now(timezone.utc) + timedelta(hours=1)  # type: ignore
+        user_orm.password_reset_expires = datetime.now(timezone.utc) + timedelta(
+            hours=1
+        )  # type: ignore
         return token
 
     def reset_password_by_token(self, token: str, new_password: str) -> Optional[User]:
-        user = self.session.query(UserORM).filter(
-            and_(
-                UserORM.password_reset_token == token,
-                UserORM.password_reset_expires > datetime.now(timezone.utc)
+        user = (
+            self.session.query(UserORM)
+            .filter(
+                and_(
+                    UserORM.password_reset_token == token,
+                    UserORM.password_reset_expires > datetime.now(timezone.utc),
+                )
             )
-        ).first()
-        
+            .first()
+        )
+
         if not user:
             return None
-            
+
         user.hashed_password = get_password_hash(new_password)  # type: ignore
         user.password_reset_token = None  # type: ignore
         user.password_reset_expires = None  # type: ignore
         return User.model_validate(user)
 
     def verify_email(self, token: str) -> Optional[User]:
-        user = self.session.query(UserORM).filter(
-            UserORM.email_verification_token == token
-        ).first()
-        
+        user = (
+            self.session.query(UserORM)
+            .filter(UserORM.email_verification_token == token)
+            .first()
+        )
+
         if not user:
             return None
-            
+
         user.email_verified = True  # type: ignore
         user.email_verification_token = None  # type: ignore
         return User.model_validate(user)

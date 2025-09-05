@@ -1,8 +1,10 @@
 import secrets
 from datetime import datetime, timedelta
-from typing import Optional, Any
+from typing import Optional
+
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+
 from app.config import ConfigLoader
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -17,7 +19,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    
+
     to_encode.update({"exp": expire})
     config = ConfigLoader.get_config()
     encoded_jwt = jwt.encode(to_encode, config.secret_key, algorithm=ALGORITHM)

@@ -1,15 +1,18 @@
 'use client';
 
-import { useState } from 'react';
 import { authService } from '@/services/authService';
 import { UserCreateAPI } from '@/types/api';
+import { useState } from 'react';
 
 interface RegisterFormProps {
   onSuccess?: (user: any) => void;
   onError?: (error: string) => void;
 }
 
-export default function RegisterForm({ onSuccess, onError }: RegisterFormProps) {
+export default function RegisterForm({
+  onSuccess,
+  onError,
+}: RegisterFormProps) {
   const [formData, setFormData] = useState<UserCreateAPI>({
     email: '',
     firstName: '',
@@ -39,7 +42,7 @@ export default function RegisterForm({ onSuccess, onError }: RegisterFormProps) 
 
     try {
       const user = await authService.register(formData);
-      
+
       if (onSuccess) {
         onSuccess(user);
       }
@@ -55,9 +58,9 @@ export default function RegisterForm({ onSuccess, onError }: RegisterFormProps) 
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -66,11 +69,14 @@ export default function RegisterForm({ onSuccess, onError }: RegisterFormProps) 
       <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
         Create Account
       </h2>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="firstName"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               First Name
             </label>
             <input
@@ -86,7 +92,10 @@ export default function RegisterForm({ onSuccess, onError }: RegisterFormProps) 
           </div>
 
           <div>
-            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="lastName"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Last Name
             </label>
             <input
@@ -103,7 +112,10 @@ export default function RegisterForm({ onSuccess, onError }: RegisterFormProps) 
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Email
           </label>
           <input
@@ -119,7 +131,10 @@ export default function RegisterForm({ onSuccess, onError }: RegisterFormProps) 
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Password
           </label>
           <input
@@ -136,7 +151,10 @@ export default function RegisterForm({ onSuccess, onError }: RegisterFormProps) 
         </div>
 
         <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="confirmPassword"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Confirm Password
           </label>
           <input

@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import Layout from '@/components/layout/Layout';
+import Link from 'next/link';
 
 export default function Home() {
   return (
@@ -10,10 +10,11 @@ export default function Home() {
             Welcome to NextJS FastAPI
           </h1>
           <p className="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
-            A full-stack application with React/NextJS frontend and FastAPI backend, 
-            featuring user authentication, profile management, and more.
+            A full-stack application with React/NextJS frontend and FastAPI
+            backend, featuring user authentication, profile management, and
+            more.
           </p>
-          
+
           <div className="mt-10 flex justify-center gap-6">
             <Link
               href="/register"
@@ -34,37 +35,76 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white rounded-lg shadow-md p-6">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                <svg
+                  className="w-6 h-6 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">User Authentication</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                User Authentication
+              </h3>
               <p className="text-gray-600">
-                Secure user registration, login, password reset, and email verification features.
+                Secure user registration, login, password reset, and email
+                verification features.
               </p>
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  className="w-6 h-6 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Modern Tech Stack</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Modern Tech Stack
+              </h3>
               <p className="text-gray-600">
-                Built with NextJS 14, React 18, TypeScript, Tailwind CSS, and FastAPI.
+                Built with NextJS 14, React 18, TypeScript, Tailwind CSS, and
+                FastAPI.
               </p>
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6">
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                <svg
+                  className="w-6 h-6 text-purple-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Fast & Scalable</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Fast & Scalable
+              </h3>
               <p className="text-gray-600">
-                Optimized for performance with server-side rendering and efficient API design.
+                Optimized for performance with server-side rendering and
+                efficient API design.
               </p>
             </div>
           </div>

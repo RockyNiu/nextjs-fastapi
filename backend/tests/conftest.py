@@ -15,9 +15,9 @@ sys.path.insert(0, str(backend_dir))
 os.environ["BACKEND_ENV"] = "test"
 
 # Import after setting up the path
-from app.db.orm.base_orm import BaseORM
 from app.config import ConfigLoader
 from app.db.database import current_database_session
+from app.db.orm.base_orm import BaseORM
 
 
 @pytest.fixture(scope="session")

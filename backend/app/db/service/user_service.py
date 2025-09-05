@@ -1,10 +1,18 @@
 from datetime import timedelta
 from typing import Optional
+
 from fastapi import HTTPException, status
 
+from app.core.security import ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token
 from app.db.dao.user_dao import UserDAO
-from app.entities.user import UserCreate, UserLogin, User, Token, ForgotPassword, PasswordReset
-from app.core.security import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
+from app.entities.user import (
+    ForgotPassword,
+    PasswordReset,
+    Token,
+    User,
+    UserCreate,
+    UserLogin,
+)
 
 
 class UserService:
@@ -16,41 +24,40 @@ class UserService:
         if self.user_dao.get_by_email(user_create.email):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email already registered"
+                detail="Email already registered",
             )
-        
+
         # Create user (email verification token is set in the DAO)
         db_user = self.user_dao.create_user(user_create)
-        
+
         # TODO: Send verification email here
-        
+
         return User.model_validate(db_user)
 
     def authenticate_user(self, user_login: UserLogin) -> Token:
         user = self.user_dao.authenticate(user_login.email, user_login.password)
-        
+
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect email or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        
+
         if not self.user_dao.is_active(user):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Inactive user"
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
             )
-        
+
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
             data={"sub": user.email}, expires_delta=access_token_expires
         )
-        
+
         return Token(
             access_token=access_token,
             token_type="bearer",
-            expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60  # Convert to seconds
+            expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
         )
 
     def get_user_by_email(self, email: str) -> Optional[User]:
@@ -63,35 +70,36 @@ class UserService:
         user = self.user_dao.get_by_email(forgot_password.email)
         if not user:
             # Don't reveal if email exists or not
-            return {"message": "If the email exists, a password reset link has been sent"}
-        
+            return {
+                "message": "If the email exists, a password reset link has been sent"
+            }
+
         self.user_dao.set_password_reset_token(forgot_password.email)
-        
+
         # TODO: Send password reset email here
-        
+
         return {"message": "If the email exists, a password reset link has been sent"}
 
     def reset_password(self, password_reset: PasswordReset) -> dict:
         user = self.user_dao.reset_password_by_token(
-            password_reset.token, 
-            password_reset.new_password
+            password_reset.token, password_reset.new_password
         )
-        
+
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid or expired reset token"
+                detail="Invalid or expired reset token",
             )
-        
+
         return {"message": "Password reset successfully"}
 
     def verify_email(self, token: str) -> dict:
         user = self.user_dao.verify_email(token)
-        
+
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid verification token"
+                detail="Invalid verification token",
             )
-        
+
         return {"message": "Email verified successfully"}

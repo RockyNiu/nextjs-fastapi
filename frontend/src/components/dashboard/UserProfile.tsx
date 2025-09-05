@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { authService } from '@/services/authService';
 import { UserAPI } from '@/types/api';
+import { useEffect, useState } from 'react';
 
 interface UserProfileProps {
   onLogout?: () => void;
@@ -129,11 +129,13 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
                 Account Status
               </label>
               <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  user.isActive 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}>
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    user.isActive
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}
+                >
                   {user.isActive ? 'Active' : 'Inactive'}
                 </span>
               </div>
@@ -147,7 +149,7 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
                 {new Date(user.dateCreated).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
-                  day: 'numeric'
+                  day: 'numeric',
                 })}
               </div>
             </div>
@@ -162,7 +164,7 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
                   month: 'long',
                   day: 'numeric',
                   hour: '2-digit',
-                  minute: '2-digit'
+                  minute: '2-digit',
                 })}
               </div>
             </div>

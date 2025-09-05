@@ -117,6 +117,7 @@ format:
 # Format backend code
 format-backend:
     @echo "🐍 Formatting backend code..."
+    cd {{backend_dir}} && uv run ruff check --fix .
     cd {{backend_dir}} && uv run ruff format .
 
 # Format frontend code

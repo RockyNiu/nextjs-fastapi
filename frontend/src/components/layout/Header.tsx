@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { authService } from '@/services/authService';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 interface HeaderProps {
   onAuthChange?: (isAuthenticated: boolean) => void;
@@ -42,17 +42,26 @@ export default function Header({ onAuthChange }: HeaderProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold text-gray-900 hover:text-blue-600">
+            <Link
+              href="/"
+              className="text-xl font-bold text-gray-900 hover:text-blue-600"
+            >
               NextJS FastAPI App
             </Link>
           </div>
 
           <nav className="hidden md:flex space-x-8">
-            <Link href="/" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+            <Link
+              href="/"
+              className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+            >
               Home
             </Link>
             {isAuthenticated && (
-              <Link href="/dashboard" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+              <Link
+                href="/dashboard"
+                className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+              >
                 Dashboard
               </Link>
             )}

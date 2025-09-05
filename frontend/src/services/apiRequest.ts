@@ -1,5 +1,5 @@
-import { ApiResponse, ApiError } from '@/types/api';
-import { toSnakeCaseKeys, toCamelCaseKeys } from '@/utils/caseConverter';
+import { ApiError, ApiResponse } from '@/types/api';
+import { toCamelCaseKeys, toSnakeCaseKeys } from '@/utils/caseConverter';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -25,20 +25,23 @@ class ApiService {
     return null;
   }
 
-  private getHeaders(contentType = 'application/json', requiresAuth = false): HeadersInit {
+  private getHeaders(
+    contentType = 'application/json',
+    requiresAuth = false
+  ): HeadersInit {
     const headers: HeadersInit = {};
-    
+
     if (contentType) {
       headers['Content-Type'] = contentType;
     }
-    
+
     if (requiresAuth) {
       const token = this.getAuthToken();
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
     }
-    
+
     return headers;
   }
 
@@ -63,7 +66,11 @@ class ApiService {
 
       console.log(`🔄 API Request: ${method} ${this.baseURL}${endpoint}`, {
         headers,
-        body: data ? (data instanceof FormData ? '[FormData]' : data) : undefined,
+        body: data
+          ? data instanceof FormData
+            ? '[FormData]'
+            : data
+          : undefined,
       });
 
       const response = await fetch(`${this.baseURL}${endpoint}`, {
@@ -106,7 +113,7 @@ class ApiService {
       if ((error as ApiError).status) {
         throw error;
       }
-      
+
       const apiError: ApiError = {
         error: 'Network error',
         detail: error instanceof Error ? error.message : 'Unknown error',

@@ -12,9 +12,7 @@ export default function Layout({ children, onAuthChange }: LayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onAuthChange={onAuthChange} />
-      <main className="py-8">
-        {children}
-      </main>
+      <main className="py-8">{children}</main>
     </div>
   );
 }

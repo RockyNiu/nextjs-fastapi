@@ -1,10 +1,10 @@
 'use client';
 
+import UserProfile from '@/components/dashboard/UserProfile';
+import Layout from '@/components/layout/Layout';
+import { authService } from '@/services/authService';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import Layout from '@/components/layout/Layout';
-import UserProfile from '@/components/dashboard/UserProfile';
-import { authService } from '@/services/authService';
 
 export default function DashboardPage() {
   const router = useRouter();
