@@ -1,4 +1,4 @@
-FROM python:3.13.2
+FROM python:3.13-alpine
 
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
