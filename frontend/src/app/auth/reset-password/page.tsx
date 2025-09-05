@@ -15,7 +15,9 @@ function ResetPasswordContent() {
       <Layout>
         <div className="max-w-md mx-auto text-center">
           <div className="bg-red-50 border border-red-200 rounded-md p-6">
-            <h2 className="text-xl font-semibold text-red-800 mb-2">Invalid Reset Link</h2>
+            <h2 className="text-xl font-semibold text-red-800 mb-2">
+              Invalid Reset Link
+            </h2>
             <p className="text-red-600 mb-4">
               The password reset link is invalid or has expired.
             </p>
@@ -32,7 +34,9 @@ function ResetPasswordContent() {
   }
 
   const handleSuccess = () => {
-    router.push('/login?message=Password%20reset%20successful!%20Please%20log%20in%20with%20your%20new%20password.');
+    router.push(
+      '/login?message=Password%20reset%20successful!%20Please%20log%20in%20with%20your%20new%20password.'
+    );
   };
 
   const handleError = (error: string) => {
@@ -54,14 +58,16 @@ function ResetPasswordContent() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={
-      <Layout>
-        <div className="max-w-md mx-auto text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading...</p>
-        </div>
-      </Layout>
-    }>
+    <Suspense
+      fallback={
+        <Layout>
+          <div className="max-w-md mx-auto text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-2 text-gray-600">Loading...</p>
+          </div>
+        </Layout>
+      }
+    >
       <ResetPasswordContent />
     </Suspense>
   );

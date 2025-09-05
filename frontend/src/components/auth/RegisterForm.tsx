@@ -188,8 +188,8 @@ export default function RegisterForm({
       <div className="mt-4 text-center">
         <p className="text-sm text-gray-600">
           Already have an account?{' '}
-          <Link 
-            href="/login" 
+          <Link
+            href="/login"
             className="text-blue-600 hover:text-blue-800 transition duration-200"
           >
             Sign in

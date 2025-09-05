@@ -109,16 +109,16 @@ export default function LoginForm({ onSuccess, onError }: LoginFormProps) {
       </form>
 
       <div className="mt-4 text-center space-y-2">
-        <Link 
-          href="/forgot-password" 
+        <Link
+          href="/forgot-password"
           className="text-sm text-blue-600 hover:text-blue-800 transition duration-200 block"
         >
           Forgot your password?
         </Link>
         <p className="text-sm text-gray-600">
           Don't have an account?{' '}
-          <Link 
-            href="/register" 
+          <Link
+            href="/register"
             className="text-blue-600 hover:text-blue-800 transition duration-200"
           >
             Sign up
