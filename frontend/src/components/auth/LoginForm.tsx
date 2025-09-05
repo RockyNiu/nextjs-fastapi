@@ -2,6 +2,7 @@
 
 import { authService } from '@/services/authService';
 import { UserLoginAPI } from '@/types/api';
+import Link from 'next/link';
 import { useState } from 'react';
 
 interface LoginFormProps {
@@ -107,10 +108,22 @@ export default function LoginForm({ onSuccess, onError }: LoginFormProps) {
         </button>
       </form>
 
-      <div className="mt-4 text-center">
-        <a href="#" className="text-sm text-blue-600 hover:text-blue-800">
+      <div className="mt-4 text-center space-y-2">
+        <Link 
+          href="/forgot-password" 
+          className="text-sm text-blue-600 hover:text-blue-800 transition duration-200 block"
+        >
           Forgot your password?
-        </a>
+        </Link>
+        <p className="text-sm text-gray-600">
+          Don't have an account?{' '}
+          <Link 
+            href="/register" 
+            className="text-blue-600 hover:text-blue-800 transition duration-200"
+          >
+            Sign up
+          </Link>
+        </p>
       </div>
     </div>
   );

@@ -43,7 +43,7 @@ router = APIRouter()
     summary="Register new user",
     description="Register a new user with email, first name, last name, and password.",
 )
-def register(user_create_api: UserCreateAPI) -> Any:
+async def register(user_create_api: UserCreateAPI) -> Any:
     """
     Register new user.
     """
@@ -56,7 +56,7 @@ def register(user_create_api: UserCreateAPI) -> Any:
     )
 
     user_service = UserService()
-    user = user_service.register_user(user_create)
+    user = await user_service.register_user(user_create)
 
     return UserAPI.model_validate(user)
 
@@ -107,7 +107,7 @@ def login(user_login_api: UserLoginAPI) -> Any:
     summary="Request password reset",
     description="Send password reset email to user.",
 )
-def forgot_password(forgot_password_api: ForgotPasswordAPI) -> Any:
+async def forgot_password(forgot_password_api: ForgotPasswordAPI) -> Any:
     """
     Send password reset email.
     """
@@ -115,7 +115,7 @@ def forgot_password(forgot_password_api: ForgotPasswordAPI) -> Any:
     forgot_password = ForgotPassword(email=forgot_password_api.email)
 
     user_service = UserService()
-    result = user_service.forgot_password(forgot_password)
+    result = await user_service.forgot_password(forgot_password)
 
     # Convert dict response to API response model
     return MessageResponseAPI(

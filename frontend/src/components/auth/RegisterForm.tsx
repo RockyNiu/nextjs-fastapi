@@ -2,6 +2,7 @@
 
 import { authService } from '@/services/authService';
 import { UserCreateAPI } from '@/types/api';
+import Link from 'next/link';
 import { useState } from 'react';
 
 interface RegisterFormProps {
@@ -187,9 +188,12 @@ export default function RegisterForm({
       <div className="mt-4 text-center">
         <p className="text-sm text-gray-600">
           Already have an account?{' '}
-          <a href="#" className="text-blue-600 hover:text-blue-800">
+          <Link 
+            href="/login" 
+            className="text-blue-600 hover:text-blue-800 transition duration-200"
+          >
             Sign in
-          </a>
+          </Link>
         </p>
       </div>
     </div>

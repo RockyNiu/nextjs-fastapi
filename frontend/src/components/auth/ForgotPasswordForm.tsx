@@ -2,6 +2,7 @@
 
 import { authService } from '@/services/authService';
 import { ForgotPasswordAPI } from '@/types/api';
+import Link from 'next/link';
 import { useState } from 'react';
 
 interface ForgotPasswordFormProps {
@@ -105,9 +106,12 @@ export default function ForgotPasswordForm({
       </form>
 
       <div className="mt-6 text-center">
-        <a href="#" className="text-sm text-blue-600 hover:text-blue-800">
+        <Link 
+          href="/login" 
+          className="text-sm text-blue-600 hover:text-blue-800 transition duration-200"
+        >
           Back to Sign In
-        </a>
+        </Link>
       </div>
     </div>
   );

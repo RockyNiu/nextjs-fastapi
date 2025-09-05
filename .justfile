@@ -144,6 +144,12 @@ fix:
 # Docker Commands
 # ============================================================================
 
+docker +args='':
+    docker-compose -f {{docker_dir}}/docker-compose.yml -f {{docker_dir}}/docker-compose-frontend.yml {{args}}
+
+docker-debug +args='':
+    docker-compose -f {{docker_dir}}/docker-compose.yml -f {{docker_dir}}/docker-compose-debug.yml -f {{docker_dir}}/docker-compose-frontend.yml {{args}}
+
 # Build all Docker images
 docker-build:
     @echo "🐳 Building Docker images..."
