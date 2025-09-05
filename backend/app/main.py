@@ -3,6 +3,12 @@ import random
 from uuid import uuid4
 
 from fastapi import APIRouter, FastAPI, HTTPException, Request, status
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -65,14 +71,19 @@ RootRouter = APIRouter()
 
 @RootRouter.get("/")
 def read_root():
-    return "Hellow World!"
+    return {"message": "Hello World!", "status": "API is working"}
+
+
+@RootRouter.get("/health")
+def health_check():
+    return {"status": "healthy", "message": "API is running"}
 
 
 @RootRouter.get("/random")
 def get_random():
     options = ["option1", "option2", "option3", "option4"]
     random_option = random.choice(options)
-    return random_option
+    return {"option": random_option}
 
 
 app.include_router(RootRouter)

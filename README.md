@@ -1,26 +1,32 @@
 # NextJS-FastAPI Fullstack Template
-This project is a fullstack template combining [Next.js](https://nextjs.org/) for the frontend and [FastAPI](https://fastapi.tiangolo.com/) for the backend. Both components are containerized using Docker for easy deployment and development.
+This project is a fullstack template combining [Next.js](https://nextjs.org/) for the frontend and [FastAPI](https://fastapi.tiangolo.com/) for the backend with complete user authentication system.
 
 ## Features
-- **Next.js Frontend**: A React-based framework for building user interfaces
-- **FastAPI Backend**: A modern, fast Python web framework for building APIs
-- **Database**: PostgreSQL with [SQLAlchemy](https://www.sqlalchemy.org/) ORM, [Alembic](https://alembic.sqlalchemy.org/) for migrations
+- **Next.js Frontend**: React-based framework with TypeScript and Tailwind CSS
+- **FastAPI Backend**: Modern Python web framework with complete authentication API
+- **Authentication System**: Registration, login, password reset, email verification
+- **Database**: PostgreSQL with [SQLAlchemy](https://www.sqlalchemy.org/) ORM and [Alembic](https://alembic.sqlalchemy.org/) migrations
+- **API Layer Separation**: Clean separation between internal and API entities
+- **Case Convention Handling**: Automatic conversion between camelCase (frontend) and snake_case (backend)
+- **Modern Package Management**: [uv](https://github.com/astral-sh/uv) for fast Python dependency management
 - **Docker Integration**: Containerized setup for both frontend and backend
-- **Testing**: Pytest for backend unit tests
-- **Linting & Formatting**: [Ruff](https://github.com/astral-sh/ruff) for Backend and [Prettier](https://prettier.io/) for Frontend
+- **Testing**: Comprehensive test suite with Pytest
+- **Code Quality**: [Ruff](https://github.com/astral-sh/ruff) for Backend and [Prettier](https://prettier.io/) for Frontend
 - **Task Automation**: [just](https://github.com/casey/just) command runner for development tasks
-- **Environment Configuration**: Simple .env-based configuration (no complex config files)
 - **Request/Response Middleware**: Built-in request logging and timing middleware
-- **[Optional] Pre-commit Hooks**: [Pre-commit](https://pre-commit.com/) for running linters and formatting checks before commits
+- **IDE-Friendly**: Commands that don't break IDE Python interpreter references
 
 ## Prerequisites
-- **Docker and Docker Compose** installed on your system
 - **Python** (^3.13.0) installed on your system
-- **Node.js** (^20.0) and npm installed on your system
-- **just** command runner installed ([installation guide](https://github.com/casey/just#installation))
+- **Node.js** (^20.0) and npm installed on your system  
+- **uv** for Python package management ([installation guide](https://github.com/astral-sh/uv#installation))
+  - macOS: `brew install uv` or `curl -LsSf https://astral.sh/uv/install.sh | sh`
+  - Linux/Windows: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+- **just** command runner ([installation guide](https://github.com/casey/just#installation))
   - macOS: `brew install just`
   - Linux: Download from releases or use package manager
   - Windows: `cargo install just` or download from releases
+- **Docker and Docker Compose** (optional, for containerized development)
 
 ## Quick Start
 1. **Clone the repository:**
@@ -36,13 +42,25 @@ This project is a fullstack template combining [Next.js](https://nextjs.org/) fo
    # Edit backend/.env with your PostgreSQL credentials
    ```
 
-3. **Start the application:**
+3. **Install dependencies:**
    ```bash
-   # Start all services with Docker
-   just docker-up-all
+   # Install all dependencies (IDE-safe)
+   just install
    ```
 
-4. **Access the application:**
+4. **Set up database:**
+   ```bash
+   # Run database migrations
+   just migrate
+   ```
+
+5. **Start development servers:**
+   ```bash
+   # Start both frontend and backend
+   just dev
+   ```
+
+6. **Access the application:**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:8000
    - API Documentation: http://localhost:8000/docs
@@ -75,26 +93,50 @@ The backend uses **PostgreSQL** as the database and **just** for task automation
    just db-upgrade
    ```
 
-#### Development Commands
+#### Key Development Commands
 ```bash
+# IDE-safe installation (recommended for daily use)
+just install
+
+# Full installation with all extras (may break IDE)
+just install-full
+
 # Start backend development server
-just backend-dev
+just dev-backend
 
 # Run tests
-just backend-test
+just test-backend
 
 # Format code
-just backend-format
+just format-backend
 
 # Lint code
-just backend-lint
+just lint-backend
 
 # Run database migrations
-just db-upgrade
+just migrate
 
 # Create new migration
-just db-revision "description"
+just migration "description"
+
+# If IDE breaks after install commands, reconfigure Python interpreter manually
 ```
+
+#### IDE Python Interpreter Setup
+After running `just install-full`, your IDE might lose connection to the Python interpreter. 
+
+**To fix:**
+1. Find your project path: `pwd` (when in the backend directory)
+2. Use the interpreter path: `[your-project-path]/backend/.venv/bin/python`
+
+**For VS Code:**
+- `Cmd+Shift+P` → "Python: Select Interpreter" 
+- Choose "Enter interpreter path..." 
+- Enter the full path above
+
+**For PyCharm:**
+- Settings → Project → Python Interpreter → Add → Existing environment
+- Browse to the `.venv/bin/python` path
 
 #### Debugging in VS Code
 1. Start the backend in debug mode:
@@ -136,6 +178,36 @@ just db-revision "description"
    ```
 
 For more details, see [frontend/README.md](frontend/README.md).
+
+## Authentication System
+
+This template includes a complete user authentication system:
+
+### Backend API Endpoints
+- `POST /auth/register` - User registration
+- `POST /auth/login` - User login (returns JWT token)  
+- `POST /auth/logout` - User logout
+- `POST /auth/forgot-password` - Send password reset email
+- `POST /auth/reset-password` - Reset password with token
+- `GET /auth/verify-email` - Verify email address
+- `GET /auth/me` - Get current user profile
+
+### Frontend Components
+- **LoginForm** - User login interface
+- **RegisterForm** - User registration with validation
+- **ForgotPasswordForm** - Password reset request
+- **UserProfile** - User dashboard and profile display
+- **Layout/Header** - Navigation with authentication state
+
+### Features
+- **JWT Authentication** - Secure token-based authentication
+- **Password Security** - Bcrypt hashing with salt
+- **Email Verification** - Optional email verification workflow
+- **Password Reset** - Secure password reset via email tokens
+- **Form Validation** - Client and server-side validation
+- **Responsive Design** - Mobile-friendly UI with Tailwind CSS
+- **Case Conversion** - Automatic camelCase ↔ snake_case conversion
+- **Error Handling** - Comprehensive error messages and states
 
 ## Project Structure
 ```text
@@ -301,7 +373,8 @@ just test
 - `just dev` - Start both frontend and backend dev servers
 - `just dev-backend` - Start FastAPI backend only
 - `just dev-frontend` - Start Next.js frontend only
-- `just install` - Install all dependencies
+- `just install` - Install dependencies (IDE-safe, recommended for daily use)
+- `just install-full` - Install all dependencies including dev extras (may break IDE)
 
 #### Database
 - `just migrate` - Run database migrations

@@ -154,6 +154,9 @@ celerybeat.pid
 *.swo
 *~
 
+# Claude Code settings
+.claude/settings.local.json
+
 # OS generated files
 .DS_Store
 .DS_Store?

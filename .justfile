@@ -17,12 +17,20 @@ default:
 # Development Commands
 # ============================================================================
 
-# Install all dependencies
+# Install all dependencies (IDE-safe)
 install:
     @echo "📦 Installing backend dependencies..."
+    cd {{backend_dir}} && uv sync --no-progress --frozen
+    @echo "📦 Installing frontend dependencies..."
+    cd {{frontend_dir}} && npm install
+
+# Full install with all extras (may break IDE)
+install-full:
+    @echo "📦 Installing ALL backend dependencies (may break IDE)..."
     cd {{backend_dir}} && uv sync --all-extras
     @echo "📦 Installing frontend dependencies..."
     cd {{frontend_dir}} && npm install
+    @echo "💡 IDE Python interpreter path: {{backend_dir}}/.venv/bin/python"
 
 # Start the development servers
 dev:
@@ -228,11 +236,20 @@ status:
     @echo "⚛️  Frontend dependencies:"
     cd {{frontend_dir}} && npm list --depth=0 2>/dev/null | head -10 || echo "Run 'npm install' first"
 
-# Update all dependencies
+# Update all dependencies (IDE-safe)
 update:
     @echo "⬆️  Updating dependencies..."
     cd {{backend_dir}} && uv lock --upgrade
+    cd {{backend_dir}} && uv sync --no-progress --frozen
     cd {{frontend_dir}} && npm update
+
+# Force update and sync all (may break IDE)
+update-full:
+    @echo "⬆️  Force updating ALL dependencies (may break IDE)..."
+    cd {{backend_dir}} && uv lock --upgrade
+    cd {{backend_dir}} && uv sync --all-extras
+    cd {{frontend_dir}} && npm update
+    @echo "💡 IDE Python interpreter path: {{backend_dir}}/.venv/bin/python"
 
 # Check for security vulnerabilities
 security:
