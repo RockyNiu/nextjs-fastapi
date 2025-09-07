@@ -152,11 +152,10 @@ async def forgot_password(forgot_password_api: ForgotPasswordAPI) -> Any:
     forgot_password = ForgotPassword(email=forgot_password_api.email)
 
     user_service = UserService()
-    result = await user_service.forgot_password(forgot_password)
+    await user_service.forgot_password(forgot_password)
 
-    # Convert dict response to API response model
     return MessageResponseAPI(
-        message=result.get("message", "Password reset email sent"), success=True
+        message="If the email exists, a password reset link has been sent", success=True
     )
 
 
@@ -186,16 +185,15 @@ def reset_password(password_reset_api: PasswordResetAPI) -> Any:
     user_service = UserService()
     
     try:
-        result = user_service.reset_password(password_reset)
+        user_service.reset_password(password_reset)
     except InvalidPasswordResetTokenError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid or expired reset token",
         )
 
-    # Convert dict response to API response model
     return MessageResponseAPI(
-        message=result.get("message", "Password reset successfully"), success=True
+        message="Password reset successfully", success=True
     )
 
 
@@ -266,7 +264,7 @@ async def resend_verification_email(
     user_service = UserService()
     
     try:
-        result = await user_service.resend_verification_email(current_user)
+        await user_service.resend_verification_email(current_user)
     except EmailAlreadyVerifiedError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -283,9 +281,8 @@ async def resend_verification_email(
             detail="Failed to send verification email",
         )
 
-    # Convert dict response to API response model
     return MessageResponseAPI(
-        message=result.get("message", "Verification email sent successfully"), success=True
+        message="Verification email sent successfully", success=True
     )
 
 
