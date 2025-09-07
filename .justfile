@@ -18,13 +18,13 @@ default:
 # ============================================================================
 
 install:
-    @echo "📦 Syncing backend dependencies..."
+    @echo "📦 Syncing backend dependencies to root .venv..."
     cd {{backend_dir}} && uv sync --all-extras
     @echo "📦 Installing frontend dependencies..."
     cd {{frontend_dir}} && npm install
     @echo "📋 Updating requirements files..."
     just update-requirements
-    @echo "💡 IDE Python interpreter path: {{backend_dir}}/.venv/bin/python"
+    @echo "💡 IDE Python interpreter path: .venv/bin/python"
 
 # Start frontend development server
 dev-frontend:
