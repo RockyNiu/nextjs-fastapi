@@ -8,7 +8,7 @@ export default function RegisterPage() {
   const router = useRouter();
 
   const handleSuccess = () => {
-    router.push('/login?message=Registration successful! Please log in.');
+    router.push('/');
   };
 
   return (

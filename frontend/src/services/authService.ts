@@ -7,16 +7,25 @@ import {
   UserAPI,
   UserCreateAPI,
   UserLoginAPI,
+  UserRegistrationResponseAPI,
 } from '@/types/api';
 import { apiService } from './apiRequest';
 
 class AuthService {
-  async register(userData: UserCreateAPI): Promise<UserAPI> {
-    const response = await apiService.request<UserAPI>({
+  async register(userData: UserCreateAPI): Promise<UserRegistrationResponseAPI> {
+    const response = await apiService.request<UserRegistrationResponseAPI>({
       endpoint: '/auth/register',
       method: 'POST',
       data: userData,
     });
+
+    // Store token in localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('access_token', response.data.accessToken);
+      localStorage.setItem('token_type', response.data.tokenType);
+      localStorage.setItem('expires_in', response.data.expiresIn.toString());
+    }
+
     return response.data;
   }
 

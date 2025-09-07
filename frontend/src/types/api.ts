@@ -23,10 +23,13 @@ export interface UserAPI {
   emailVerified: boolean;
 }
 
-export interface TokenResponseAPI {
+export interface TokenAPI {
   accessToken: string;
   tokenType: string;
   expiresIn: number;
+}
+
+export interface TokenResponseAPI extends TokenAPI {
 }
 
 export interface ForgotPasswordAPI {
@@ -43,12 +46,13 @@ export interface MessageResponseAPI {
   success: boolean;
 }
 
-export interface EmailVerificationResponseAPI {
+export interface EmailVerificationResponseAPI extends TokenAPI {
   message: string;
   success: boolean;
-  accessToken: string;
-  tokenType: string;
-  expiresIn: number;
+}
+
+export interface UserRegistrationResponseAPI extends TokenAPI {
+  user: UserAPI;
 }
 
 export interface ErrorResponseAPI {

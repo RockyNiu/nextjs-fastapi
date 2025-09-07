@@ -35,7 +35,7 @@ class UserService:
         self.user_dao = user_dao or UserDAO()
         self.email_service = email_service or EmailService()
 
-    async def register_user(self, user_create: UserCreate) -> User:
+    async def register_user(self, user_create: UserCreate) -> UserWithAccessToken:
         # Check if user already exists
         if self.user_dao.get_by_email(user_create.email):
             raise UserAlreadyExistsError("Email already registered")
@@ -53,7 +53,21 @@ class UserService:
             # Log the error but don't fail registration
             print(f"Failed to send verification email to {db_user.email}: {e}")
 
-        return User.model_validate(db_user)
+        # Generate access token for the new user
+        user = User.model_validate(db_user)
+        access_token_expires = timedelta(seconds=ACCESS_TOKEN_EXPIRE_SECONDS)
+        access_token = create_access_token(
+            data={"sub": user.email}, expires_delta=access_token_expires
+        )
+
+        return UserWithAccessToken(
+            user=user,
+            token=Token(
+                access_token=access_token,
+                token_type="bearer",
+                expires_in=ACCESS_TOKEN_EXPIRE_SECONDS,
+            )
+        )
 
     def authenticate_user(self, user_login: UserLogin) -> Token:
         user = self.user_dao.authenticate(user_login.email, user_login.password)

@@ -12,6 +12,7 @@ from app.api.entities.user_api import (
     UserAPI,
     UserCreateAPI,
     UserLoginAPI,
+    UserRegistrationResponseAPI,
 )
 from app.core.deps import get_current_active_user
 from app.entities.user import (
@@ -38,10 +39,10 @@ router = APIRouter()
 
 @router.post(
     "/register",
-    response_model=UserAPI,
+    response_model=UserRegistrationResponseAPI,
     status_code=status.HTTP_201_CREATED,
     responses={
-        201: {"description": "User successfully registered"},
+        201: {"description": "User successfully registered with authentication token"},
         400: {
             "model": ErrorResponseAPI,
             "description": "Bad request - validation error",
@@ -52,7 +53,7 @@ router = APIRouter()
         },
     },
     summary="Register new user",
-    description="Register a new user with email, first name, last name, and password.",
+    description="Register a new user with email, first name, last name, and password. Returns user data and authentication token for automatic login.",
 )
 async def register(user_create_api: UserCreateAPI) -> Any:
     """
@@ -69,14 +70,19 @@ async def register(user_create_api: UserCreateAPI) -> Any:
     user_service = UserService()
     
     try:
-        user = await user_service.register_user(user_create)
+        result = await user_service.register_user(user_create)
     except UserAlreadyExistsError:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Email already registered",
         )
 
-    return UserAPI.model_validate(user)
+    return UserRegistrationResponseAPI(
+        user=UserAPI.model_validate(result.user),
+        access_token=result.token.access_token,
+        token_type=result.token.token_type,
+        expires_in=result.token.expires_in,
+    )
 
 
 @router.post(

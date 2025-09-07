@@ -146,14 +146,14 @@ class UserAPI(BaseModel):
     ]
 
 
-class TokenResponseAPI(BaseModel):
-    """API model for authentication token responses to frontend"""
+class TokenAPI(BaseModel):
+    """API model for authentication token data"""
 
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
                 "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                "token_type": "bearer",
+                "token_type": "bearer", 
                 "expires_in": 3600,
             }
         }
@@ -181,6 +181,11 @@ class TokenResponseAPI(BaseModel):
             json_schema_extra={"example": 3600},
         ),
     ]
+
+
+class TokenResponseAPI(TokenAPI):
+    """API model for authentication token responses to frontend"""
+    pass
 
 
 class ForgotPasswordAPI(BaseModel):
@@ -255,7 +260,7 @@ class MessageResponseAPI(BaseModel):
     ]
 
 
-class EmailVerificationResponseAPI(BaseModel):
+class EmailVerificationResponseAPI(TokenAPI):
     """API model for email verification responses that includes authentication token"""
 
     model_config = ConfigDict(
@@ -285,27 +290,32 @@ class EmailVerificationResponseAPI(BaseModel):
             json_schema_extra={"example": True},
         ),
     ]
-    access_token: Annotated[
-        str,
-        Field(
-            description="JWT access token for automatic login",
-            json_schema_extra={"example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."},
-        ),
-    ]
-    token_type: Annotated[
-        str,
-        Field(
-            description="Token type",
-            json_schema_extra={"example": "bearer"},
-        ),
-    ]
-    expires_in: Annotated[
-        int,
-        Field(
-            description="Token expiration time in seconds",
-            json_schema_extra={"example": 3600},
-        ),
-    ]
+
+
+class UserRegistrationResponseAPI(TokenAPI):
+    """API model for user registration responses that includes user data and authentication token"""
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "user": {
+                    "id": 1,
+                    "email": "user@example.com",
+                    "firstName": "John",
+                    "lastName": "Doe",
+                    "isActive": True,
+                    "emailVerified": False,
+                    "dateCreated": "2025-01-01T12:00:00Z",
+                    "dateUpdated": "2025-01-01T12:00:00Z",
+                },
+                "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                "token_type": "bearer",
+                "expires_in": 3600,
+            }
+        }
+    )
+
+    user: UserAPI
 
 
 class ErrorResponseAPI(BaseModel):
