@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 
 export default function VerifyEmailPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
@@ -32,8 +33,19 @@ export default function VerifyEmailPage() {
       try {
         const result = await authService.verifyEmail(token);
         console.log('✅ Email verification successful:', result);
-        setStatus('success');
-        setMessage(result.message || 'Email verified successfully!');
+        
+        // Store the authentication token if provided
+        if (result.accessToken && result.tokenType && result.expiresIn) {
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('access_token', result.accessToken);
+            localStorage.setItem('token_type', result.tokenType);
+            localStorage.setItem('expires_in', result.expiresIn.toString());
+          }
+          console.log('🔑 User automatically logged in after verification');
+        }
+        
+        console.log('🏠 Redirecting to home page after successful verification');
+        router.push('/');
       } catch (error: any) {
         console.log('❌ Email verification failed:', error);
         setStatus('error');

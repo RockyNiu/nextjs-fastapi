@@ -1,4 +1,5 @@
 import {
+  EmailVerificationResponseAPI,
   ForgotPasswordAPI,
   MessageResponseAPI,
   PasswordResetAPI,
@@ -84,8 +85,8 @@ class AuthService {
     return response.data;
   }
 
-  async verifyEmail(token: string): Promise<MessageResponseAPI> {
-    const response = await apiService.request<MessageResponseAPI>({
+  async verifyEmail(token: string): Promise<EmailVerificationResponseAPI> {
+    const response = await apiService.request<EmailVerificationResponseAPI>({
       endpoint: `/auth/verify-email?token=${encodeURIComponent(token)}`,
       method: 'GET',
     });

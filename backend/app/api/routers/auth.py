@@ -1,8 +1,9 @@
 from typing import Any
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.api.entities.user_api import (
+    EmailVerificationResponseAPI,
     ErrorResponseAPI,
     ForgotPasswordAPI,
     MessageResponseAPI,
@@ -19,6 +20,16 @@ from app.entities.user import (
     User,
     UserCreate,
     UserLogin,
+)
+from app.exceptions.user_exceptions import (
+    EmailAlreadyVerifiedError,
+    EmailSendError,
+    InactiveUserError,
+    InvalidCredentialsError,
+    InvalidPasswordResetTokenError,
+    InvalidVerificationTokenError,
+    NoVerificationTokenError,
+    UserAlreadyExistsError,
 )
 from app.service.user_service import UserService
 
@@ -56,7 +67,14 @@ async def register(user_create_api: UserCreateAPI) -> Any:
     )
 
     user_service = UserService()
-    user = await user_service.register_user(user_create)
+    
+    try:
+        user = await user_service.register_user(user_create)
+    except UserAlreadyExistsError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email already registered",
+        )
 
     return UserAPI.model_validate(user)
 
@@ -86,7 +104,20 @@ def login(user_login_api: UserLoginAPI) -> Any:
     user_login = UserLogin(email=user_login_api.email, password=user_login_api.password)
 
     user_service = UserService()
-    token = user_service.authenticate_user(user_login)
+    
+    try:
+        token = user_service.authenticate_user(user_login)
+    except InvalidCredentialsError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except InactiveUserError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User account is inactive",
+        )
 
     # Convert internal model to API response model
     return TokenResponseAPI(
@@ -147,7 +178,14 @@ def reset_password(password_reset_api: PasswordResetAPI) -> Any:
     )
 
     user_service = UserService()
-    result = user_service.reset_password(password_reset)
+    
+    try:
+        result = user_service.reset_password(password_reset)
+    except InvalidPasswordResetTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset token",
+        )
 
     # Convert dict response to API response model
     return MessageResponseAPI(
@@ -157,27 +195,38 @@ def reset_password(password_reset_api: PasswordResetAPI) -> Any:
 
 @router.get(
     "/verify-email",
-    response_model=MessageResponseAPI,
+    response_model=EmailVerificationResponseAPI,
     responses={
-        200: {"description": "Email verified successfully"},
+        200: {"description": "Email verified successfully with authentication token"},
         400: {"model": ErrorResponseAPI, "description": "Bad request - invalid token"},
         404: {"model": ErrorResponseAPI, "description": "Invalid or expired token"},
     },
     summary="Verify email address",
-    description="Verify user email address using verification token.",
+    description="Verify user email address using verification token and return authentication token for automatic login.",
 )
 def verify_email(
     token: str = Query(..., description="Email verification token"),
 ) -> Any:
     """
-    Verify user email using token.
+    Verify user email using token and return authentication token.
     """
     user_service = UserService()
-    result = user_service.verify_email(token)
+    
+    try:
+        result = user_service.verify_email(token)
+    except InvalidVerificationTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired verification token. If you recently verified your email, please log in to your account.",
+        )
 
-    # Convert dict response to API response model
-    return MessageResponseAPI(
-        message=result.get("message", "Email verified successfully"), success=True
+    # Convert response to API response model
+    return EmailVerificationResponseAPI(
+        message="Email verified successfully",
+        success=True,
+        access_token=result.token.access_token,
+        token_type=result.token.token_type,
+        expires_in=result.token.expires_in,
     )
 
 
@@ -209,7 +258,24 @@ async def resend_verification_email(
     Resend verification email to current user.
     """
     user_service = UserService()
-    result = await user_service.resend_verification_email(current_user)
+    
+    try:
+        result = await user_service.resend_verification_email(current_user)
+    except EmailAlreadyVerifiedError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email is already verified",
+        )
+    except NoVerificationTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No verification token found",
+        )
+    except EmailSendError:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to send verification email",
+        )
 
     # Convert dict response to API response model
     return MessageResponseAPI(

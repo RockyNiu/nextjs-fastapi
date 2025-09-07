@@ -54,5 +54,7 @@ class Token(BaseModel):
     expires_in: int
 
 
-class TokenData(BaseModel):
-    email: Optional[str] = None
+class UserWithAccessToken(BaseModel):
+    """User object with authentication token for auto-login scenarios"""
+    user: User
+    token: Token

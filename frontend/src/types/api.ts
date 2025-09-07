@@ -43,6 +43,14 @@ export interface MessageResponseAPI {
   success: boolean;
 }
 
+export interface EmailVerificationResponseAPI {
+  message: string;
+  success: boolean;
+  accessToken: string;
+  tokenType: string;
+  expiresIn: number;
+}
+
 export interface ErrorResponseAPI {
   error: string;
   detail?: string;

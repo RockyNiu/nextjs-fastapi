@@ -255,6 +255,59 @@ class MessageResponseAPI(BaseModel):
     ]
 
 
+class EmailVerificationResponseAPI(BaseModel):
+    """API model for email verification responses that includes authentication token"""
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "message": "Email verified successfully",
+                "success": True,
+                "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                "token_type": "bearer",
+                "expires_in": 3600,
+            }
+        }
+    )
+
+    message: Annotated[
+        str,
+        Field(
+            description="Verification message",
+            json_schema_extra={"example": "Email verified successfully"},
+        ),
+    ]
+    success: Annotated[
+        bool,
+        Field(
+            default=True,
+            description="Whether the verification was successful",
+            json_schema_extra={"example": True},
+        ),
+    ]
+    access_token: Annotated[
+        str,
+        Field(
+            description="JWT access token for automatic login",
+            json_schema_extra={"example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."},
+        ),
+    ]
+    token_type: Annotated[
+        str,
+        Field(
+            description="Token type",
+            json_schema_extra={"example": "bearer"},
+        ),
+    ]
+    expires_in: Annotated[
+        int,
+        Field(
+            description="Token expiration time in seconds",
+            json_schema_extra={"example": 3600},
+        ),
+    ]
+
+
 class ErrorResponseAPI(BaseModel):
     """API model for error responses to frontend"""
 
