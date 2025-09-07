@@ -29,8 +29,7 @@ export interface TokenAPI {
   expiresIn: number;
 }
 
-export interface TokenResponseAPI extends TokenAPI {
-}
+export interface TokenResponseAPI extends TokenAPI {}
 
 export interface ForgotPasswordAPI {
   email: string;

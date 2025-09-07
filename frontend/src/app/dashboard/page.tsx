@@ -17,7 +17,7 @@ export default function DashboardPage() {
   }, [router]);
 
   const handleLogout = () => {
-    setKey(prev => prev + 1);
+    setKey((prev) => prev + 1);
     router.push('/');
   };
 

@@ -12,7 +12,9 @@ import {
 import { apiService } from './apiRequest';
 
 class AuthService {
-  async register(userData: UserCreateAPI): Promise<UserRegistrationResponseAPI> {
+  async register(
+    userData: UserCreateAPI
+  ): Promise<UserRegistrationResponseAPI> {
     const response = await apiService.request<UserRegistrationResponseAPI>({
       endpoint: '/auth/register',
       method: 'POST',

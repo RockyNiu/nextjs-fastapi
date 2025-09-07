@@ -1,17 +1,17 @@
-
-
 'use client';
 
 import Layout from '@/components/layout/Layout';
 import { authService } from '@/services/authService';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function VerifyEmailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    'loading'
+  );
   const [message, setMessage] = useState('');
   const hasVerifiedRef = useRef(false);
 
@@ -19,21 +19,24 @@ export default function VerifyEmailPage() {
     const verifyEmail = async () => {
       if (hasVerifiedRef.current) return; // Prevent multiple calls
       hasVerifiedRef.current = true;
-      
+
       const token = searchParams.get('token');
-      
+
       if (!token) {
         setStatus('error');
         setMessage('Verification token is missing');
         return;
       }
 
-      console.log('🔄 Starting email verification with token:', token.substring(0, 10) + '...');
+      console.log(
+        '🔄 Starting email verification with token:',
+        token.substring(0, 10) + '...'
+      );
 
       try {
         const result = await authService.verifyEmail(token);
         console.log('✅ Email verification successful:', result);
-        
+
         // Store the authentication token if provided
         if (result.accessToken && result.tokenType && result.expiresIn) {
           if (typeof window !== 'undefined') {
@@ -43,8 +46,10 @@ export default function VerifyEmailPage() {
           }
           console.log('🔑 User automatically logged in after verification');
         }
-        
-        console.log('🏠 Redirecting to home page after successful verification');
+
+        console.log(
+          '🏠 Redirecting to home page after successful verification'
+        );
         router.push('/');
       } catch (error: any) {
         console.log('❌ Email verification failed:', error);

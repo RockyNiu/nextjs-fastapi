@@ -68,7 +68,7 @@ async def register(user_create_api: UserCreateAPI) -> Any:
     )
 
     user_service = UserService()
-    
+
     try:
         result = await user_service.register_user(user_create)
     except UserAlreadyExistsError:
@@ -110,7 +110,7 @@ def login(user_login_api: UserLoginAPI) -> Any:
     user_login = UserLogin(email=user_login_api.email, password=user_login_api.password)
 
     user_service = UserService()
-    
+
     try:
         token = user_service.authenticate_user(user_login)
     except InvalidCredentialsError:
@@ -183,7 +183,7 @@ def reset_password(password_reset_api: PasswordResetAPI) -> Any:
     )
 
     user_service = UserService()
-    
+
     try:
         user_service.reset_password(password_reset)
     except InvalidPasswordResetTokenError:
@@ -192,9 +192,7 @@ def reset_password(password_reset_api: PasswordResetAPI) -> Any:
             detail="Invalid or expired reset token",
         )
 
-    return MessageResponseAPI(
-        message="Password reset successfully", success=True
-    )
+    return MessageResponseAPI(message="Password reset successfully", success=True)
 
 
 @router.get(
@@ -215,7 +213,7 @@ def verify_email(
     Verify user email using token and return authentication token.
     """
     user_service = UserService()
-    
+
     try:
         result = user_service.verify_email(token)
     except InvalidVerificationTokenError:
@@ -262,7 +260,7 @@ async def resend_verification_email(
     Resend verification email to current user.
     """
     user_service = UserService()
-    
+
     try:
         await user_service.resend_verification_email(current_user)
     except EmailAlreadyVerifiedError:

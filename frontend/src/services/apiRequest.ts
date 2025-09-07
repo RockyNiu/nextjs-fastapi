@@ -96,8 +96,12 @@ class ApiService {
 
       if (!response.ok) {
         const apiError: ApiError = {
-          error: responseData.error || responseData.message || `HTTP ${response.status}`,
-          detail: responseData.detail || responseData.message || response.statusText,
+          error:
+            responseData.error ||
+            responseData.message ||
+            `HTTP ${response.status}`,
+          detail:
+            responseData.detail || responseData.message || response.statusText,
           status: response.status,
         };
         throw apiError;

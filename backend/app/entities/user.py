@@ -56,5 +56,6 @@ class Token(BaseModel):
 
 class UserWithAccessToken(BaseModel):
     """User object with authentication token for auto-login scenarios"""
+
     user: User
     token: Token

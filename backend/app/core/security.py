@@ -18,7 +18,9 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(seconds=ACCESS_TOKEN_EXPIRE_SECONDS)
+        expire = datetime.now(timezone.utc) + timedelta(
+            seconds=ACCESS_TOKEN_EXPIRE_SECONDS
+        )
 
     to_encode.update({"exp": expire})
     config = ConfigLoader.get_config()

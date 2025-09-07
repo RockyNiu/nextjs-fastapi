@@ -26,8 +26,6 @@ from app.exceptions.user_exceptions import (
 from app.service.email_service import EmailService
 
 
-
-
 class UserService:
     def __init__(
         self,
@@ -68,7 +66,7 @@ class UserService:
                 access_token=access_token,
                 token_type="bearer",
                 expires_in=ACCESS_TOKEN_EXPIRE_SECONDS,
-            )
+            ),
         )
 
     def authenticate_user(self, user_login: UserLogin) -> Token:
@@ -140,7 +138,7 @@ class UserService:
                 access_token=access_token,
                 token_type="bearer",
                 expires_in=ACCESS_TOKEN_EXPIRE_SECONDS,
-            )
+            ),
         )
 
     async def resend_verification_email(self, user: User) -> None:

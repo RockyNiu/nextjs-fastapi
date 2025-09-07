@@ -153,7 +153,7 @@ class TokenAPI(BaseModel):
         json_schema_extra={
             "example": {
                 "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                "token_type": "bearer", 
+                "token_type": "bearer",
                 "expires_in": 3600,
             }
         }
@@ -185,6 +185,7 @@ class TokenAPI(BaseModel):
 
 class TokenResponseAPI(TokenAPI):
     """API model for authentication token responses to frontend"""
+
     pass
 
 
