@@ -11,6 +11,17 @@ from app.entities.user import (
     User,
     UserCreate,
     UserLogin,
+    UserWithAccessToken,
+)
+from app.exceptions.user_exceptions import (
+    EmailAlreadyVerifiedError,
+    EmailSendError,
+    InactiveUserError,
+    InvalidCredentialsError,
+    InvalidPasswordResetTokenError,
+    InvalidVerificationTokenError,
+    NoVerificationTokenError,
+    UserAlreadyExistsError,
 )
 from app.service.email_service import EmailService
 from app.service.user_service import UserService
@@ -31,11 +42,24 @@ class TestUserService:
         return email_service
 
     @pytest.fixture
+    def mock_auth_service(self) -> Mock:
+        """Create a mock AuthService for testing."""
+        from app.service.auth_service import AuthService
+        auth_service = Mock(spec=AuthService)
+        auth_service.create_access_token.return_value = "fake_token"
+        auth_service.ACCESS_TOKEN_EXPIRE_SECONDS = 30 * 60
+        return auth_service
+
+    @pytest.fixture
     def user_service(
-        self, mock_user_dao: Mock, mock_email_service: Mock
+        self, mock_user_dao: Mock, mock_email_service: Mock, mock_auth_service: Mock
     ) -> UserService:
-        """Create a UserService instance with mocked DAO and EmailService."""
-        return UserService(user_dao=mock_user_dao, email_service=mock_email_service)
+        """Create a UserService instance with mocked DAO, EmailService, and AuthService."""
+        return UserService(
+            user_dao=mock_user_dao,
+            email_service=mock_email_service,
+            auth_service=mock_auth_service
+        )
 
     @pytest.mark.asyncio
     async def test_register_user_success(
@@ -43,6 +67,7 @@ class TestUserService:
         user_service: UserService,
         mock_user_dao: Mock,
         mock_email_service: Mock,
+        mock_auth_service: Mock,
         sample_user_create: UserCreate,
         sample_db_user: Mock,
     ) -> None:
@@ -55,14 +80,16 @@ class TestUserService:
         result = await user_service.register_user(sample_user_create)
 
         # Assert
-        assert isinstance(result, User)
-        assert result.email == sample_user_create.email
+        assert isinstance(result, UserWithAccessToken)
+        assert result.user.email == sample_user_create.email
         mock_user_dao.get_by_email.assert_called_once_with(sample_user_create.email)
         mock_user_dao.create_user.assert_called_once_with(sample_user_create)
         # Verify email verification was sent
         mock_email_service.send_verification_email.assert_called_once_with(
             sample_db_user.email, sample_db_user.email_verification_token
         )
+        # Verify access token was created
+        mock_auth_service.create_access_token.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_register_user_already_exists(
@@ -77,20 +104,18 @@ class TestUserService:
         mock_user_dao.get_by_email.return_value = sample_db_user  # User exists
 
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(UserAlreadyExistsError) as exc_info:
             await user_service.register_user(sample_user_create)
 
-        assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
-        assert "Email already registered" in str(exc_info.value.detail)
+        assert str(exc_info.value) == "Email already registered"
         mock_user_dao.get_by_email.assert_called_once_with(sample_user_create.email)
         mock_user_dao.create_user.assert_not_called()
 
-    @patch("app.service.user_service.create_access_token")
     def test_authenticate_user_success(
         self,
-        mock_create_token: Mock,
         user_service: UserService,
         mock_user_dao: Mock,
+        mock_auth_service: Mock,
         sample_user_login: UserLogin,
         sample_db_user: Mock,
     ) -> None:
@@ -98,7 +123,6 @@ class TestUserService:
         # Arrange
         mock_user_dao.authenticate.return_value = sample_db_user
         mock_user_dao.is_active.return_value = True
-        mock_create_token.return_value = "fake_token"
 
         # Act
         result = user_service.authenticate_user(sample_user_login)
@@ -112,6 +136,7 @@ class TestUserService:
             sample_user_login.email, sample_user_login.password
         )
         mock_user_dao.is_active.assert_called_once_with(sample_db_user)
+        mock_auth_service.create_access_token.assert_called_once()
 
     def test_authenticate_user_invalid_credentials(
         self,
@@ -124,11 +149,10 @@ class TestUserService:
         mock_user_dao.authenticate.return_value = None  # Authentication failed
 
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(InvalidCredentialsError) as exc_info:
             user_service.authenticate_user(sample_user_login)
 
-        assert exc_info.value.status_code == status.HTTP_401_UNAUTHORIZED
-        assert "Incorrect email or password" in str(exc_info.value.detail)
+        assert str(exc_info.value) == "Incorrect email or password"
         mock_user_dao.authenticate.assert_called_once_with(
             sample_user_login.email, sample_user_login.password
         )
@@ -146,11 +170,10 @@ class TestUserService:
         mock_user_dao.is_active.return_value = False  # User is inactive
 
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(InactiveUserError) as exc_info:
             user_service.authenticate_user(sample_user_login)
 
-        assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
-        assert "Inactive user" in str(exc_info.value.detail)
+        assert str(exc_info.value) == "User account is inactive"
         mock_user_dao.authenticate.assert_called_once_with(
             sample_user_login.email, sample_user_login.password
         )
@@ -206,10 +229,7 @@ class TestUserService:
         result = await user_service.forgot_password(forgot_password)
 
         # Assert
-        assert (
-            result["message"]
-            == "If the email exists, a password reset link has been sent"
-        )
+        assert result is None
         mock_user_dao.get_by_email.assert_called_once_with(forgot_password.email)
         mock_user_dao.set_password_reset_token.assert_called_once_with(
             forgot_password.email
@@ -232,10 +252,7 @@ class TestUserService:
         result = await user_service.forgot_password(forgot_password)
 
         # Assert
-        assert (
-            result["message"]
-            == "If the email exists, a password reset link has been sent"
-        )
+        assert result is None
         mock_user_dao.get_by_email.assert_called_once_with(forgot_password.email)
         mock_user_dao.set_password_reset_token.assert_not_called()
 
@@ -253,7 +270,7 @@ class TestUserService:
         result = user_service.reset_password(password_reset)
 
         # Assert
-        assert result["message"] == "Password reset successfully"
+        assert result is None
         mock_user_dao.reset_password_by_token.assert_called_once_with(
             password_reset.token, password_reset.new_password
         )
@@ -269,17 +286,16 @@ class TestUserService:
         mock_user_dao.reset_password_by_token.return_value = None
 
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(InvalidPasswordResetTokenError) as exc_info:
             user_service.reset_password(password_reset)
 
-        assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
-        assert "Invalid or expired reset token" in str(exc_info.value.detail)
+        assert str(exc_info.value) == "Invalid or expired reset token"
         mock_user_dao.reset_password_by_token.assert_called_once_with(
             password_reset.token, password_reset.new_password
         )
 
     def test_verify_email_success(
-        self, user_service: UserService, mock_user_dao: Mock, sample_db_user: Mock
+        self, user_service: UserService, mock_user_dao: Mock, mock_auth_service: Mock, sample_db_user: Mock
     ) -> None:
         """Test successful email verification."""
         # Arrange
@@ -290,8 +306,9 @@ class TestUserService:
         result = user_service.verify_email(token)
 
         # Assert
-        assert result["message"] == "Email verified successfully"
+        assert isinstance(result, UserWithAccessToken)
         mock_user_dao.verify_email.assert_called_once_with(token)
+        mock_auth_service.create_access_token.assert_called_once()
 
     def test_verify_email_invalid_token(
         self, user_service: UserService, mock_user_dao: Mock
@@ -302,11 +319,10 @@ class TestUserService:
         mock_user_dao.verify_email.return_value = None
 
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(InvalidVerificationTokenError) as exc_info:
             user_service.verify_email(token)
 
-        assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
-        assert "Invalid verification token" in str(exc_info.value.detail)
+        assert str(exc_info.value) == "Invalid or expired verification token"
         mock_user_dao.verify_email.assert_called_once_with(token)
 
     def test_user_service_with_custom_dao(

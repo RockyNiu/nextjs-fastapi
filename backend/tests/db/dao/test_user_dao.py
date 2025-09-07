@@ -47,30 +47,34 @@ class TestUserDAO(DaoTest):
             email_verified=False,
             date_created=datetime.now(timezone.utc),
             date_updated=datetime.now(timezone.utc),
-        )
+        ) 
+        
 
-        # Mock the query chain
-        with patch.object(test_session, "query") as mock_query:
-            mock_query.return_value.filter.return_value.first.return_value = (
-                mock_user_orm
-            )
+        # Mock the execute method and result
+        mock_result = Mock()
+        mock_result.scalar_one_or_none.return_value = mock_user_orm
+        
+        with patch.object(test_session, "execute") as mock_execute:
+            mock_execute.return_value = mock_result
 
             dao = UserDAO(test_session)
             result = dao.get_by_email("test@example.com")
 
-            # Should return User, not UserORM
             assert isinstance(result, User)
             assert result.email == "test@example.com"
             assert result.first_name == "John"
             assert result.last_name == "Doe"
-            mock_query.assert_called_once_with(UserORM)
-            mock_query.return_value.filter.assert_called_once()
-            mock_query.return_value.filter.return_value.first.assert_called_once()
+            mock_execute.assert_called_once()
+            mock_result.scalar_one_or_none.assert_called_once()
 
     def test_get_by_email_non_existent_user(self, test_session: Session) -> None:  # type: ignore[misc]
         """Test getting a non-existent user by email returns None."""
-        with patch.object(test_session, "query") as mock_query:
-            mock_query.return_value.filter.return_value.first.return_value = None
+        # Mock the execute method and result
+        mock_result = Mock()
+        mock_result.scalar_one_or_none.return_value = None
+        
+        with patch.object(test_session, "execute") as mock_execute:
+            mock_execute.return_value = mock_result
 
             dao = UserDAO(test_session)
             result = dao.get_by_email("nonexistent@example.com")
@@ -233,10 +237,13 @@ class TestUserDAO(DaoTest):
         mock_user_orm = UserORM(email="user@example.com")
         dao = UserDAO(test_session)
 
-        with patch.object(test_session, "query") as mock_query:
-            mock_query.return_value.filter.return_value.first.return_value = (
-                mock_user_orm
-            )
+        # Mock the execute method and result
+        mock_result = Mock()
+        mock_result.scalar_one_or_none.return_value = mock_user_orm
+        
+        with patch.object(test_session, "execute") as mock_execute, \
+             patch.object(test_session, "flush") as mock_flush:
+            mock_execute.return_value = mock_result
 
             result = dao.set_password_reset_token("user@example.com")
 
@@ -245,6 +252,7 @@ class TestUserDAO(DaoTest):
             assert len(result) > 0
             assert mock_user_orm.password_reset_token == result  # type: ignore
             assert mock_user_orm.password_reset_expires is not None  # type: ignore
+            mock_flush.assert_called_once()
 
     def test_reset_password_by_token_success(self, test_session: Session) -> None:  # type: ignore[misc]
         """Test successful password reset by token."""
@@ -261,10 +269,13 @@ class TestUserDAO(DaoTest):
             date_updated=datetime.now(timezone.utc),
         )
 
-        with patch.object(test_session, "query") as mock_query:
-            mock_query.return_value.filter.return_value.first.return_value = (
-                mock_user_orm
-            )
+        # Mock the execute method and result
+        mock_result = Mock()
+        mock_result.scalar_one_or_none.return_value = mock_user_orm
+        
+        with patch.object(test_session, "execute") as mock_execute, \
+             patch.object(test_session, "flush"):
+            mock_execute.return_value = mock_result
             dao = UserDAO(test_session)
 
             result = dao.reset_password_by_token("valid_token", "new_password")
@@ -321,10 +332,13 @@ class TestUserDAO(DaoTest):
             date_updated=datetime.now(timezone.utc),
         )
 
-        with patch.object(test_session, "query") as mock_query:
-            mock_query.return_value.filter.return_value.first.return_value = (
-                mock_user_orm
-            )
+        # Mock the execute method and result
+        mock_result = Mock()
+        mock_result.scalar_one_or_none.return_value = mock_user_orm
+        
+        with patch.object(test_session, "execute") as mock_execute, \
+             patch.object(test_session, "flush") as mock_flush:
+            mock_execute.return_value = mock_result
 
             dao = UserDAO(test_session)
             result = dao.verify_email("verification_token")
@@ -332,6 +346,7 @@ class TestUserDAO(DaoTest):
             # Should return User entity
             assert isinstance(result, User)
             assert mock_user_orm.email_verified is True  # type: ignore
+            mock_flush.assert_called_once()
             assert mock_user_orm.email_verification_token is None  # type: ignore
 
     def test_verify_email_invalid_token(self, test_session: Session) -> None:  # type: ignore[misc]

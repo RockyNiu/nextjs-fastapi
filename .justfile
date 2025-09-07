@@ -18,8 +18,8 @@ default:
 # ============================================================================
 
 install:
-    @echo "📦 Syncing backend dependencies to root .venv..."
-    cd {{backend_dir}} && uv sync --all-extras
+    @echo "📦 Installing backend dependencies to root .venv..."
+    source .venv/bin/activate && uv pip install -e "./{{backend_dir}}[dev]"
     @echo "📦 Installing frontend dependencies..."
     cd {{frontend_dir}} && npm install
     @echo "📋 Updating requirements files..."
@@ -38,28 +38,28 @@ dev-frontend:
 # Run database migrations
 migrate:
     @echo "🗄️  Running database migrations..."
-    cd {{backend_dir}} && uv run --active alembic upgrade head
+    cd {{backend_dir}} && uv run alembic upgrade head
 
 # Create a new migration
 migration message:
     @echo "📝 Creating new migration: {{message}}"
-    cd {{backend_dir}} && uv run --active alembic revision --autogenerate -m "{{message}}"
+    cd {{backend_dir}} && uv run alembic revision --autogenerate -m "{{message}}"
 
 # Reset database (down and up)
 db-reset:
     @echo "♻️  Resetting database..."
-    cd {{backend_dir}} && uv run --active alembic downgrade base
-    cd {{backend_dir}} && uv run --active alembic upgrade head
+    cd {{backend_dir}} && uv run alembic downgrade base
+    cd {{backend_dir}} && uv run alembic upgrade head
 
 # Show migration history
 db-history:
     @echo "📜 Database migration history:"
-    cd {{backend_dir}} && uv run --active alembic history
+    cd {{backend_dir}} && uv run alembic history
 
 # Show current database revision
 db-current:
     @echo "📍 Current database revision:"
-    cd {{backend_dir}} && uv run --active alembic current
+    cd {{backend_dir}} && uv run alembic current
 
 # ============================================================================
 # Testing Commands
@@ -74,12 +74,12 @@ test:
 # Run backend tests
 test-backend:
     @echo "🐍 Running backend tests..."
-    cd {{backend_dir}} && uv run --active pytest
+    cd {{backend_dir}} && ../.venv/bin/python -m pytest
 
 # Run backend tests with coverage
 test-coverage:
     @echo "📊 Running backend tests with coverage..."
-    cd {{backend_dir}} && uv run --active pytest --cov=app --cov-report=html --cov-report=term
+    cd {{backend_dir}} && ../.venv/bin/python -m pytest --cov=app --cov-report=html --cov-report=term
 
 # Run frontend tests
 test-frontend:
@@ -158,15 +158,15 @@ update:
 # Update requirements files
 update-requirements:
     @echo "📋 Updating requirements files..."
-    cd {{backend_dir}} && uv export --active --no-dev --format requirements-txt --no-hashes --no-emit-project > requirements.txt
-    cd {{backend_dir}} && uv export --active --format requirements-txt --no-hashes --no-emit-project > requirements-dev.txt
+    cd {{backend_dir}} && uv export --no-dev --format requirements-txt --no-hashes --no-emit-project > requirements.txt
+    cd {{backend_dir}} && uv export --format requirements-txt --no-hashes --no-emit-project > requirements-dev.txt
     @echo "✅ Requirements files updated!"
 
 # Force update and sync all (may break IDE)
 update-full:
     @echo "⬆️  Force updating ALL dependencies (may break IDE)..."
-    cd {{backend_dir}} && uv lock --active --upgrade
-    cd {{backend_dir}} && uv sync --active --all-extras
+    cd {{backend_dir}} && uv lock --upgrade
+    cd {{backend_dir}} && uv sync --all-extras
     cd {{frontend_dir}} && npm update
     @echo "💡 IDE Python interpreter path: .venv/bin/python"
 

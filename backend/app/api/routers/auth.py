@@ -2,6 +2,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
+from app.api.deps import get_current_active_user
 from app.api.entities.user_api import (
     EmailVerificationResponseAPI,
     ErrorResponseAPI,
@@ -14,7 +15,6 @@ from app.api.entities.user_api import (
     UserLoginAPI,
     UserRegistrationResponseAPI,
 )
-from app.api.deps import get_current_active_user
 from app.entities.user import (
     ForgotPassword,
     PasswordReset,

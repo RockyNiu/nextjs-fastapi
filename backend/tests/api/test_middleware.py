@@ -43,7 +43,7 @@ def test_middleware_preserves_response_content(client: TestClient) -> None:
     assert response.status_code == 200
     # The root endpoint returns a simple string message
     response_data = response.json()
-    assert response_data == "Hellow World!"
+    assert response_data == {"message": "Hello World!", "status": "API is working"}
 
 
 def test_middleware_handles_different_endpoints(client: TestClient) -> None:
