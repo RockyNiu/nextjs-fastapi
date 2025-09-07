@@ -1,5 +1,5 @@
 {
-    "python.terminal.activateEnvironment": true,
+    "python.terminal.activateEnvironment": false,
     "python.analysis.autoImportCompletions": true,
     "python.analysis.autoSearchPaths": true,
     "python.analysis.indexing": true,

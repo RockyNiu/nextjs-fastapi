@@ -1,8 +1,9 @@
 from datetime import timedelta
 from typing import Optional
 
-from app.core.logger import logger
-from app.core.security import ACCESS_TOKEN_EXPIRE_SECONDS, create_access_token
+from app.common.logger import logger
+from app.service.auth_service import AuthService
+from app.service.crypto_service import CryptoService
 from app.db.dao.user_dao import UserDAO
 from app.entities.user import (
     ForgotPassword,
@@ -31,9 +32,13 @@ class UserService:
         self,
         user_dao: Optional[UserDAO] = None,
         email_service: Optional[EmailService] = None,
+        auth_service: Optional[AuthService] = None,
+        crypto_service: Optional[CryptoService] = None,
     ):
         self.user_dao = user_dao or UserDAO()
         self.email_service = email_service or EmailService()
+        self.auth_service = auth_service or AuthService()
+        self.crypto_service = crypto_service or CryptoService()
 
     async def register_user(self, user_create: UserCreate) -> UserWithAccessToken:
         # Check if user already exists
@@ -55,8 +60,8 @@ class UserService:
 
         # Generate access token for the new user
         user = User.model_validate(db_user)
-        access_token_expires = timedelta(seconds=ACCESS_TOKEN_EXPIRE_SECONDS)
-        access_token = create_access_token(
+        access_token_expires = timedelta(seconds=self.auth_service.ACCESS_TOKEN_EXPIRE_SECONDS)
+        access_token = self.auth_service.create_access_token(
             data={"sub": user.email}, expires_delta=access_token_expires
         )
 
@@ -65,7 +70,7 @@ class UserService:
             token=Token(
                 access_token=access_token,
                 token_type="bearer",
-                expires_in=ACCESS_TOKEN_EXPIRE_SECONDS,
+                expires_in=self.auth_service.ACCESS_TOKEN_EXPIRE_SECONDS,
             ),
         )
 
@@ -78,15 +83,15 @@ class UserService:
         if not self.user_dao.is_active(user):
             raise InactiveUserError("User account is inactive")
 
-        access_token_expires = timedelta(seconds=ACCESS_TOKEN_EXPIRE_SECONDS)
-        access_token = create_access_token(
+        access_token_expires = timedelta(seconds=self.auth_service.ACCESS_TOKEN_EXPIRE_SECONDS)
+        access_token = self.auth_service.create_access_token(
             data={"sub": user.email}, expires_delta=access_token_expires
         )
 
         return Token(
             access_token=access_token,
             token_type="bearer",
-            expires_in=ACCESS_TOKEN_EXPIRE_SECONDS,
+            expires_in=self.auth_service.ACCESS_TOKEN_EXPIRE_SECONDS,
         )
 
     def get_user_by_email(self, email: str) -> Optional[User]:
@@ -94,6 +99,14 @@ class UserService:
         if user:
             return User.model_validate(user)
         return None
+
+    def get_user_by_token(self, token: str) -> Optional[User]:
+        """Get user by JWT token"""
+        email = self.auth_service.verify_token(token)
+        if not email:
+            return None
+        
+        return self.get_user_by_email(email)
 
     async def forgot_password(self, forgot_password: ForgotPassword) -> None:
         user = self.user_dao.get_by_email(forgot_password.email)
@@ -127,8 +140,8 @@ class UserService:
             raise InvalidVerificationTokenError("Invalid or expired verification token")
 
         # Generate access token for the verified user
-        access_token_expires = timedelta(seconds=ACCESS_TOKEN_EXPIRE_SECONDS)
-        access_token = create_access_token(
+        access_token_expires = timedelta(seconds=self.auth_service.ACCESS_TOKEN_EXPIRE_SECONDS)
+        access_token = self.auth_service.create_access_token(
             data={"sub": user.email}, expires_delta=access_token_expires
         )
 
@@ -137,7 +150,7 @@ class UserService:
             token=Token(
                 access_token=access_token,
                 token_type="bearer",
-                expires_in=ACCESS_TOKEN_EXPIRE_SECONDS,
+                expires_in=self.auth_service.ACCESS_TOKEN_EXPIRE_SECONDS,
             ),
         )
 

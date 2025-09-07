@@ -4,9 +4,7 @@ from unittest.mock import Mock, patch
 
 from sqlalchemy.orm import Session
 
-from app.core.security import (
-    get_password_hash,
-)
+from app.service.crypto_service import CryptoService
 from app.db.dao.user_dao import UserDAO
 from app.db.orm.user_orm import UserORM
 from app.entities.user import User, UserCreate
@@ -122,7 +120,8 @@ class TestUserDAO(DaoTest):
         """Test successful user authentication."""
         # Create UserORM for testing - since authenticate queries UserORM directly
 
-        hashed_password = get_password_hash("correct_password")
+        crypto_service = CryptoService()
+        hashed_password = crypto_service.get_password_hash("correct_password")
         mock_user_orm = UserORM(
             id=1,
             email="user@example.com",
@@ -167,7 +166,8 @@ class TestUserDAO(DaoTest):
         """Test authentication with wrong password."""
         # Create UserORM for testing - since authenticate queries UserORM directly
 
-        hashed_password = get_password_hash("correct_password")
+        crypto_service = CryptoService()
+        hashed_password = crypto_service.get_password_hash("correct_password")
         mock_user_orm = UserORM(
             id=1,
             email="user@example.com",

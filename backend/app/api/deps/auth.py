@@ -3,9 +3,8 @@ from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from app.core.security import verify_token
-from app.db.dao.user_dao import UserDAO
 from app.entities.user import User
+from app.service.user_service import UserService
 
 security = HTTPBearer()
 
@@ -20,18 +19,13 @@ def get_current_user(
     )
 
     token = credentials.credentials
-    email = verify_token(token)
-
-    if email is None:
-        raise credentials_exception
-
-    user_dao = UserDAO()
-    user = user_dao.get_by_email(email=email)
+    user_service = UserService()
+    user = user_service.get_user_by_token(token)
 
     if user is None:
         raise credentials_exception
 
-    return User.model_validate(user)
+    return user
 
 
 def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
@@ -49,15 +43,5 @@ def get_optional_current_user(
         return None
 
     token = credentials.credentials
-    email = verify_token(token)
-
-    if email is None:
-        return None
-
-    user_dao = UserDAO()
-    user = user_dao.get_by_email(email=email)
-
-    if user is None:
-        return None
-
-    return User.model_validate(user)
+    user_service = UserService()
+    return user_service.get_user_by_token(token)

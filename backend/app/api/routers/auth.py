@@ -14,7 +14,7 @@ from app.api.entities.user_api import (
     UserLoginAPI,
     UserRegistrationResponseAPI,
 )
-from app.core.deps import get_current_active_user
+from app.api.deps import get_current_active_user
 from app.entities.user import (
     ForgotPassword,
     PasswordReset,
