@@ -4,22 +4,107 @@ import Layout from '@/components/layout/Layout';
 import Link from 'next/link';
 import { authService } from '@/services/authService';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { UserAPI } from '@/types/api';
 
 export default function Home() {
   const router = useRouter();
+  const [user, setUser] = useState<UserAPI | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [verificationSent, setVerificationSent] = useState(false);
 
   useEffect(() => {
-    if (authService.isAuthenticated()) {
-      router.push('/dashboard');
-    }
+    checkAuthAndUser();
   }, [router]);
 
-  // Show loading or nothing while redirecting
-  if (authService.isAuthenticated()) {
-    return null;
+  const checkAuthAndUser = async () => {
+    if (authService.isAuthenticated()) {
+      try {
+        const userData = await authService.getCurrentUser();
+        setUser(userData);
+        
+        // If user is verified, redirect to dashboard
+        if (userData.emailVerified) {
+          router.push('/dashboard');
+          return;
+        }
+      } catch (error) {
+        console.error('Failed to get user data:', error);
+        // If API fails, just treat as not authenticated
+        setUser(null);
+      }
+    }
+    setIsLoading(false);
+  };
+
+  const handleResendVerification = async () => {
+    try {
+      await authService.resendVerificationEmail();
+      setVerificationSent(true);
+    } catch (error) {
+      console.error('Failed to resend verification:', error);
+    }
+  };
+
+  // Show loading while checking auth status
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center min-h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      </Layout>
+    );
   }
 
+  // Show verification prompt for unverified users
+  if (user && !user.emailVerified) {
+    return (
+      <Layout>
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-yellow-800">
+                  Email Verification Required
+                </h3>
+                <div className="mt-2 text-sm text-yellow-700">
+                  <p>
+                    Please verify your email address ({user.email}) to access the dashboard.
+                    Check your inbox for a verification email.
+                  </p>
+                </div>
+                <div className="mt-4">
+                  <div className="-mx-2 -my-1.5 flex">
+                    <button
+                      type="button"
+                      onClick={handleResendVerification}
+                      className="bg-yellow-50 px-2 py-1.5 rounded-md text-sm font-medium text-yellow-800 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-yellow-50 focus:ring-yellow-600"
+                    >
+                      {verificationSent ? 'Verification Sent!' : 'Resend Verification Email'}
+                    </button>
+                    <Link
+                      href="/dashboard"
+                      className="ml-3 bg-yellow-50 px-2 py-1.5 rounded-md text-sm font-medium text-yellow-800 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-yellow-50 focus:ring-yellow-600"
+                    >
+                      Continue to Dashboard
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Show welcome page for unauthenticated users
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -126,3 +126,33 @@ class UserService:
             )
 
         return {"message": "Email verified successfully"}
+
+    async def resend_verification_email(self, user: User) -> dict:
+        # Check if user is already verified
+        if user.email_verified:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email is already verified",
+            )
+
+        # Get the current user data with verification token
+        db_user = self.user_dao.get_by_email(user.email)
+        if not db_user or not db_user.email_verification_token:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No verification token found",
+            )
+
+        # Send verification email
+        try:
+            await self.email_service.send_verification_email(
+                db_user.email, db_user.email_verification_token
+            )
+        except Exception as e:
+            print(f"Failed to resend verification email to {db_user.email}: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to send verification email",
+            )
+
+        return {"message": "Verification email sent successfully"}

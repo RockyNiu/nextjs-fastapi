@@ -12,6 +12,8 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
   const [user, setUser] = useState<UserAPI | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>('');
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [verificationLoading, setVerificationLoading] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -36,6 +38,23 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
       }
     } catch (err) {
       console.error('Logout failed:', err);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    setVerificationLoading(true);
+    setError(''); // Clear any previous errors
+    try {
+      await authService.resendVerificationEmail();
+      setVerificationSent(true);
+      // Reset the success message after 5 seconds
+      setTimeout(() => setVerificationSent(false), 5000);
+    } catch (err: any) {
+      console.error('Failed to resend verification:', err);
+      const errorMessage = err.detail || err.error || err.message || 'Failed to resend verification email. Please try again.';
+      setError(`Verification Error: ${errorMessage}`);
+    } finally {
+      setVerificationLoading(false);
     }
   };
 
@@ -73,14 +92,8 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="flex justify-between items-start mb-6">
+        <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">User Profile</h1>
-          <button
-            onClick={handleLogout}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm transition duration-200"
-          >
-            Logout
-          </button>
         </div>
 
         {user && (
@@ -110,18 +123,48 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
                 Email Address
               </label>
               <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-900">
-                {user.email}
-                {!user.emailVerified && (
-                  <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                    Not Verified
-                  </span>
-                )}
-                {user.emailVerified && (
-                  <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Verified
-                  </span>
-                )}
+                <div className="flex items-center justify-between">
+                  <div>
+                    {user.email}
+                    {!user.emailVerified && (
+                      <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        Not Verified
+                      </span>
+                    )}
+                    {user.emailVerified && (
+                      <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Verified
+                      </span>
+                    )}
+                  </div>
+                  {!user.emailVerified && (
+                    <button
+                      onClick={handleResendVerification}
+                      disabled={verificationLoading}
+                      className="ml-3 bg-yellow-600 hover:bg-yellow-700 disabled:bg-yellow-400 text-white px-3 py-1 rounded text-xs font-medium transition duration-200 flex items-center"
+                    >
+                      {verificationLoading ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-2 h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Sending...
+                        </>
+                      ) : verificationSent ? (
+                        'Sent!'
+                      ) : (
+                        'Resend Verification'
+                      )}
+                    </button>
+                  )}
+                </div>
               </div>
+              {!user.emailVerified && verificationSent && (
+                <p className="mt-1 text-sm text-green-600">
+                  Verification email sent! Check your inbox.
+                </p>
+              )}
             </div>
 
             <div>

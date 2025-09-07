@@ -181,6 +181,42 @@ def verify_email(
     )
 
 
+@router.post(
+    "/resend-verification",
+    response_model=MessageResponseAPI,
+    responses={
+        200: {"description": "Verification email sent successfully"},
+        400: {
+            "model": ErrorResponseAPI,
+            "description": "Bad request - email already verified or no token found",
+        },
+        401: {
+            "model": ErrorResponseAPI,
+            "description": "Unauthorized - invalid or expired token",
+        },
+        500: {
+            "model": ErrorResponseAPI,
+            "description": "Internal server error - failed to send email",
+        },
+    },
+    summary="Resend verification email",
+    description="Resend email verification for the current authenticated user.",
+)
+async def resend_verification_email(
+    current_user: User = Depends(get_current_active_user),
+) -> Any:
+    """
+    Resend verification email to current user.
+    """
+    user_service = UserService()
+    result = await user_service.resend_verification_email(current_user)
+
+    # Convert dict response to API response model
+    return MessageResponseAPI(
+        message=result.get("message", "Verification email sent successfully"), success=True
+    )
+
+
 @router.get(
     "/me",
     response_model=UserAPI,

@@ -92,6 +92,15 @@ class AuthService {
     return response.data;
   }
 
+  async resendVerificationEmail(): Promise<MessageResponseAPI> {
+    const response = await apiService.request<MessageResponseAPI>({
+      endpoint: '/auth/resend-verification',
+      method: 'POST',
+      requiresAuth: true,
+    });
+    return response.data;
+  }
+
   isAuthenticated(): boolean {
     if (typeof window === 'undefined') return false;
     const token = localStorage.getItem('access_token');

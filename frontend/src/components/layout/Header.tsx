@@ -2,6 +2,7 @@
 
 import { authService } from '@/services/authService';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface HeaderProps {
@@ -9,6 +10,7 @@ interface HeaderProps {
 }
 
 export default function Header({ onAuthChange }: HeaderProps) {
+  const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -32,6 +34,7 @@ export default function Header({ onAuthChange }: HeaderProps) {
       if (onAuthChange) {
         onAuthChange(false);
       }
+      router.push('/');
     } catch (error) {
       console.error('Logout failed:', error);
     }
