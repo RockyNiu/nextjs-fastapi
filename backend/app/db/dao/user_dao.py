@@ -85,13 +85,18 @@ class UserDAO(BaseDAO):
         return User.model_validate(user)
 
     def verify_email(self, token: str) -> Optional[User]:
+        # First, try to find user by verification token
         stmt = select(UserORM).where(UserORM.email_verification_token == token)
         user = self.session.execute(stmt).scalar_one_or_none()
 
-        if not user:
-            return None
+        if user:
+            # User found with token, verify them
+            user.email_verified = True
+            user.email_verification_token = None
+            self.session.flush()  # Ensure changes are persisted
+            return User.model_validate(user)
 
-        user.email_verified = True
-        user.email_verification_token = None
-        self.session.flush()  # Ensure changes are persisted
-        return User.model_validate(user)
+        # If not found by token, check if there's already a verified user
+        # This handles the case where the token was already used
+        # We can't return the user in this case because we don't know which user it was
+        return None

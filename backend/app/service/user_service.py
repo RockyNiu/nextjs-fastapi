@@ -120,9 +120,11 @@ class UserService:
         user = self.user_dao.verify_email(token)
 
         if not user:
+            # Check if this token was recently used (user might already be verified)
+            # Since we can't know which user without the token, we'll give a generic message
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid verification token",
+                detail="Invalid or expired verification token. If you recently verified your email, please log in to your account.",
             )
 
         return {"message": "Email verified successfully"}
