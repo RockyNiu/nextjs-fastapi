@@ -1,7 +1,25 @@
+'use client';
+
 import Layout from '@/components/layout/Layout';
 import Link from 'next/link';
+import { authService } from '@/services/authService';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (authService.isAuthenticated()) {
+      router.push('/dashboard');
+    }
+  }, [router]);
+
+  // Show loading or nothing while redirecting
+  if (authService.isAuthenticated()) {
+    return null;
+  }
+
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
