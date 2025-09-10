@@ -13,10 +13,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [verificationSent, setVerificationSent] = useState(false);
 
-  useEffect(() => {
-    checkAuthAndUser();
-  }, [router, checkAuthAndUser]);
-
   const checkAuthAndUser = useCallback(async () => {
     if (authService.isAuthenticated()) {
       try {
@@ -36,6 +32,10 @@ export default function Home() {
     }
     setIsLoading(false);
   }, [router]);
+
+  useEffect(() => {
+    checkAuthAndUser();
+  }, [checkAuthAndUser]);
 
   const handleResendVerification = async () => {
     try {
