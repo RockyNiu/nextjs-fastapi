@@ -4,10 +4,10 @@ from unittest.mock import Mock, patch
 
 from sqlalchemy.orm import Session
 
-from app.service.crypto_service import CryptoService
 from app.db.dao.user_dao import UserDAO
 from app.db.orm.user_orm import UserORM
 from app.entities.user import User, UserCreate
+from app.service.crypto_service import CryptoService
 from tests.db.dao.dao_test import DaoTest
 
 
@@ -47,13 +47,12 @@ class TestUserDAO(DaoTest):
             email_verified=False,
             date_created=datetime.now(timezone.utc),
             date_updated=datetime.now(timezone.utc),
-        ) 
-        
+        )
 
         # Mock the execute method and result
         mock_result = Mock()
         mock_result.scalar_one_or_none.return_value = mock_user_orm
-        
+
         with patch.object(test_session, "execute") as mock_execute:
             mock_execute.return_value = mock_result
 
@@ -72,7 +71,7 @@ class TestUserDAO(DaoTest):
         # Mock the execute method and result
         mock_result = Mock()
         mock_result.scalar_one_or_none.return_value = None
-        
+
         with patch.object(test_session, "execute") as mock_execute:
             mock_execute.return_value = mock_result
 
@@ -240,9 +239,11 @@ class TestUserDAO(DaoTest):
         # Mock the execute method and result
         mock_result = Mock()
         mock_result.scalar_one_or_none.return_value = mock_user_orm
-        
-        with patch.object(test_session, "execute") as mock_execute, \
-             patch.object(test_session, "flush") as mock_flush:
+
+        with (
+            patch.object(test_session, "execute") as mock_execute,
+            patch.object(test_session, "flush") as mock_flush,
+        ):
             mock_execute.return_value = mock_result
 
             result = dao.set_password_reset_token("user@example.com")
@@ -272,9 +273,11 @@ class TestUserDAO(DaoTest):
         # Mock the execute method and result
         mock_result = Mock()
         mock_result.scalar_one_or_none.return_value = mock_user_orm
-        
-        with patch.object(test_session, "execute") as mock_execute, \
-             patch.object(test_session, "flush"):
+
+        with (
+            patch.object(test_session, "execute") as mock_execute,
+            patch.object(test_session, "flush"),
+        ):
             mock_execute.return_value = mock_result
             dao = UserDAO(test_session)
 
@@ -335,9 +338,11 @@ class TestUserDAO(DaoTest):
         # Mock the execute method and result
         mock_result = Mock()
         mock_result.scalar_one_or_none.return_value = mock_user_orm
-        
-        with patch.object(test_session, "execute") as mock_execute, \
-             patch.object(test_session, "flush") as mock_flush:
+
+        with (
+            patch.object(test_session, "execute") as mock_execute,
+            patch.object(test_session, "flush") as mock_flush,
+        ):
             mock_execute.return_value = mock_result
 
             dao = UserDAO(test_session)

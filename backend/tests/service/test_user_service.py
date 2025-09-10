@@ -1,7 +1,6 @@
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, Mock
 
 import pytest
-from fastapi import HTTPException, status
 
 from app.db.dao.user_dao import UserDAO
 from app.entities.user import (
@@ -14,13 +13,10 @@ from app.entities.user import (
     UserWithAccessToken,
 )
 from app.exceptions.user_exceptions import (
-    EmailAlreadyVerifiedError,
-    EmailSendError,
     InactiveUserError,
     InvalidCredentialsError,
     InvalidPasswordResetTokenError,
     InvalidVerificationTokenError,
-    NoVerificationTokenError,
     UserAlreadyExistsError,
 )
 from app.service.email_service import EmailService
@@ -45,6 +41,7 @@ class TestUserService:
     def mock_auth_service(self) -> Mock:
         """Create a mock AuthService for testing."""
         from app.service.auth_service import AuthService
+
         auth_service = Mock(spec=AuthService)
         auth_service.create_access_token.return_value = "fake_token"
         auth_service.ACCESS_TOKEN_EXPIRE_SECONDS = 30 * 60
@@ -58,7 +55,7 @@ class TestUserService:
         return UserService(
             user_dao=mock_user_dao,
             email_service=mock_email_service,
-            auth_service=mock_auth_service
+            auth_service=mock_auth_service,
         )
 
     @pytest.mark.asyncio
@@ -295,7 +292,11 @@ class TestUserService:
         )
 
     def test_verify_email_success(
-        self, user_service: UserService, mock_user_dao: Mock, mock_auth_service: Mock, sample_db_user: Mock
+        self,
+        user_service: UserService,
+        mock_user_dao: Mock,
+        mock_auth_service: Mock,
+        sample_db_user: Mock,
     ) -> None:
         """Test successful email verification."""
         # Arrange

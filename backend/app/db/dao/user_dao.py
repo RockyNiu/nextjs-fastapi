@@ -4,10 +4,10 @@ from typing import Optional
 from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 
-from app.service.crypto_service import CryptoService
 from app.db.dao.base_dao import BaseDAO
 from app.db.orm.user_orm import UserORM
 from app.entities.user import User, UserCreate
+from app.service.crypto_service import CryptoService
 
 
 class UserDAO(BaseDAO):
@@ -41,7 +41,9 @@ class UserDAO(BaseDAO):
         user_orm = self.session.execute(stmt).scalar_one_or_none()
         if not user_orm or user_orm.hashed_password is None:
             return None
-        if not self.crypto_service.verify_password(password, str(user_orm.hashed_password)):
+        if not self.crypto_service.verify_password(
+            password, str(user_orm.hashed_password)
+        ):
             return None
         return User.model_validate(user_orm)
 
