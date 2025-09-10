@@ -69,7 +69,7 @@ export default function VerifyEmailPage() {
     };
 
     verifyEmail();
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   return (
     <Layout>
