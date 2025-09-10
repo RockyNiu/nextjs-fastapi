@@ -55,8 +55,8 @@ class UserService:
                     db_user.email, db_user.email_verification_token
                 )
         except Exception as e:
-            # Log the error but don't fail registration
             logger.error(f"Failed to send verification email to {db_user.email}: {e}")
+            raise EmailSendError("Failed to send verification email")
 
         # Generate access token for the new user
         user = User.model_validate(db_user)

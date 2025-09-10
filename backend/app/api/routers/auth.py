@@ -51,6 +51,10 @@ router = APIRouter()
             "model": ErrorResponseAPI,
             "description": "Conflict - user already exists",
         },
+        500: {
+            "model": ErrorResponseAPI,
+            "description": "Internal server error - failed to send verification email",
+        },
     },
     summary="Register new user",
     description="Register a new user with email, first name, last name, and password. Returns user data and authentication token for automatic login.",
@@ -75,6 +79,11 @@ async def register(user_create_api: UserCreateAPI) -> Any:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Email already registered",
+        )
+    except EmailSendError:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="User registration completed but verification email could not be sent. Please use the resend verification option to receive your verification email.",
         )
 
     return UserRegistrationResponseAPI(
