@@ -1,7 +1,7 @@
 """Integration tests that require a real database connection."""
 
 import pytest
-from app.db.database import DatabaseManager
+from app.db.database import DatabaseManager, database_context
 from app.db.dao.user_dao import UserDAO
 from app.entities.user import UserCreate
 
@@ -19,70 +19,87 @@ class TestDatabaseIntegration:
     def test_database_connection(self):
         """Test that we can connect to the database."""
         # This will fail if database is not accessible
-        user_dao = UserDAO()
-        assert user_dao.session is not None
+        with database_context():
+            user_dao = UserDAO()
+            assert user_dao.session is not None
 
     def test_user_creation_and_retrieval(self):
         """Test creating and retrieving a user from the database."""
-        user_dao = UserDAO()
+        from sqlalchemy import select
+        from app.db.orm.user_orm import UserORM
         
-        # Create test user
-        user_create = UserCreate(
-            email="integration-test@example.com",
-            first_name="Integration",
-            last_name="Test",
-            password="testpassword123"
-        )
-        
-        # Clean up existing test user if any
-        existing_user = user_dao.get_by_email(user_create.email)
-        if existing_user:
-            user_dao.session.delete(existing_user)
-            user_dao.session.commit()
-        
-        # Create new user
-        created_user = user_dao.create_user(user_create)
-        assert created_user is not None
-        assert created_user.email == user_create.email
-        
-        # Retrieve user
-        retrieved_user = user_dao.get_by_email(user_create.email)
-        assert retrieved_user is not None
-        assert retrieved_user.id == created_user.id
-        
-        # Clean up
-        user_dao.session.delete(created_user)
-        user_dao.session.commit()
+        with database_context():
+            user_dao = UserDAO()
+            
+            # Create test user
+            user_create = UserCreate(
+                email="integration-test@example.com",
+                first_name="Integration",
+                last_name="Test",
+                password="testpassword123"
+            )
+            
+            # Clean up existing test user if any (using ORM)
+            stmt = select(UserORM).where(UserORM.email == user_create.email)
+            existing_user_orm = user_dao.session.execute(stmt).scalar_one_or_none()
+            if existing_user_orm:
+                user_dao.session.delete(existing_user_orm)
+                user_dao.session.commit()
+            
+            # Create new user
+            created_user = user_dao.create_user(user_create)
+            assert created_user is not None
+            assert created_user.email == user_create.email
+            
+            # Retrieve user
+            retrieved_user = user_dao.get_by_email(user_create.email)
+            assert retrieved_user is not None
+            assert retrieved_user.id == created_user.id
+            
+            # Clean up using ORM
+            stmt = select(UserORM).where(UserORM.email == user_create.email)
+            created_user_orm = user_dao.session.execute(stmt).scalar_one_or_none()
+            if created_user_orm:
+                user_dao.session.delete(created_user_orm)
+                user_dao.session.commit()
 
     def test_user_authentication_flow(self):
         """Test complete user authentication flow."""
-        user_dao = UserDAO()
+        from sqlalchemy import select
+        from app.db.orm.user_orm import UserORM
         
-        user_create = UserCreate(
-            email="auth-test@example.com",
-            first_name="Auth",
-            last_name="Test",
-            password="testpassword123"
-        )
-        
-        # Clean up existing test user if any
-        existing_user = user_dao.get_by_email(user_create.email)
-        if existing_user:
-            user_dao.session.delete(existing_user)
-            user_dao.session.commit()
-        
-        # Create user
-        created_user = user_dao.create_user(user_create)
-        
-        # Test authentication
-        authenticated_user = user_dao.authenticate(user_create.email, user_create.password)
-        assert authenticated_user is not None
-        assert authenticated_user.id == created_user.id
-        
-        # Test wrong password
-        wrong_auth = user_dao.authenticate(user_create.email, "wrongpassword")
-        assert wrong_auth is None
-        
-        # Clean up
-        user_dao.session.delete(created_user)
-        user_dao.session.commit()
+        with database_context():
+            user_dao = UserDAO()
+            
+            user_create = UserCreate(
+                email="auth-test@example.com",
+                first_name="Auth",
+                last_name="Test",
+                password="testpassword123"
+            )
+            
+            # Clean up existing test user if any (using ORM)
+            stmt = select(UserORM).where(UserORM.email == user_create.email)
+            existing_user_orm = user_dao.session.execute(stmt).scalar_one_or_none()
+            if existing_user_orm:
+                user_dao.session.delete(existing_user_orm)
+                user_dao.session.commit()
+            
+            # Create user
+            created_user = user_dao.create_user(user_create)
+            
+            # Test authentication
+            authenticated_user = user_dao.authenticate(user_create.email, user_create.password)
+            assert authenticated_user is not None
+            assert authenticated_user.id == created_user.id
+            
+            # Test wrong password
+            wrong_auth = user_dao.authenticate(user_create.email, "wrongpassword")
+            assert wrong_auth is None
+            
+            # Clean up using ORM
+            stmt = select(UserORM).where(UserORM.email == user_create.email)
+            created_user_orm = user_dao.session.execute(stmt).scalar_one_or_none()
+            if created_user_orm:
+                user_dao.session.delete(created_user_orm)
+                user_dao.session.commit()
