@@ -1,4 +1,4 @@
-FROM python:3.13.2
+FROM python:3.13-alpine
 
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
@@ -7,10 +7,10 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 WORKDIR /app
 
 # Copy the project requirements
-COPY pyproject.toml uv.lock /app/
+COPY requirements.txt /app/
 
 # Install dependencies
-RUN uv sync --frozen --no-cache --no-dev
+RUN uv pip install --system -r requirements.txt --no-cache
 
 # Copy the rest of the application
 COPY . /app

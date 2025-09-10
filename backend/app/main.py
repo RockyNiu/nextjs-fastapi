@@ -3,11 +3,16 @@ import random
 from uuid import uuid4
 
 from fastapi import APIRouter, FastAPI, HTTPException, Request, status
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.middleware import BaseMiddleware, RequestInterceptorMiddleware
-from app.api.routers.item import ItemRouter
+from app.api.routers.auth import router as AuthRouter
 
 app = FastAPI()
 
@@ -65,15 +70,20 @@ RootRouter = APIRouter()
 
 @RootRouter.get("/")
 def read_root():
-    return "Hellow World!"
+    return {"message": "Hello World!", "status": "API is working"}
+
+
+@RootRouter.get("/health")
+def health_check():
+    return {"status": "healthy", "message": "API is running"}
 
 
 @RootRouter.get("/random")
 def get_random():
-    items = ["item1", "item2", "item3", "item4"]  # Replace with your list of items
-    random_item = random.choice(items)
-    return random_item
+    options = ["option1", "option2", "option3", "option4"]
+    random_option = random.choice(options)
+    return {"option": random_option}
 
 
 app.include_router(RootRouter)
-app.include_router(ItemRouter)
+app.include_router(AuthRouter, prefix="/auth", tags=["Authentication"])

@@ -44,10 +44,55 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=template_db
 
+# Email Configuration
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password-here
+MAIL_FROM=your-email@gmail.com
+MAIL_PORT=587
+MAIL_SERVER=smtp.gmail.com
+FRONTEND_URL=http://localhost:3000
+
 # Application Configuration
 APP_HOST=0.0.0.0
 APP_PORT=8000
 APP_ENV=development
+```
+
+### Gmail Configuration for Email Service
+
+To use Gmail for sending emails (password reset, verification, etc.), you need to set up an App Password:
+
+#### Step-by-Step Instructions:
+
+1. **Enable 2-Factor Authentication** (required for App Passwords):
+   - Go to [Google Account Settings](https://myaccount.google.com/)
+   - Navigate to "Security" → "2-Step Verification"
+   - Follow the setup instructions
+
+2. **Generate an App Password**:
+   - Go to [Google Account Settings](https://myaccount.google.com/)
+   - Navigate to "Security" → "2-Step Verification" → "App passwords"
+   - Select "Mail" as the app and your device
+   - Copy the 16-character password generated
+
+3. **Update your `.env` file**:
+   ```bash
+   MAIL_USERNAME=your-email@gmail.com
+   MAIL_PASSWORD=your-16-character-app-password  # NOT your regular Gmail password
+   MAIL_FROM=your-email@gmail.com
+   ```
+
+#### Important Notes:
+- **Never use your regular Gmail password** - only use the App Password
+- Keep your App Password secure and don't commit it to version control
+- For production, consider using dedicated email services like SendGrid or AWS SES
+- If you don't have 2FA enabled, you cannot create App Passwords
+
+#### Alternative Email Providers:
+If you prefer not to use Gmail, you can configure other SMTP providers by updating:
+- `MAIL_SERVER`: SMTP server address
+- `MAIL_PORT`: SMTP port (usually 587 for TLS)
+- `MAIL_USERNAME` and `MAIL_PASSWORD`: Your credentials
 ```
 
 ## Database Setup
@@ -129,6 +174,7 @@ alembic downgrade -1
 
 2. Use the "Backend: debug in docker" launch configuration in VS Code
 3. Set breakpoints and press F5 to start debugging
+   - **Note**: Debugpy is installed automatically when using debug mode
 
 ## Optional
 ```bash

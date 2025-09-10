@@ -1,3 +1,8 @@
+"""
+Any fixture .py files added to `tests.utils.fixtures` will need to be added
+as a plugin to the list below.
+"""
+
 import os
 import sys
 from pathlib import Path
@@ -15,9 +20,15 @@ sys.path.insert(0, str(backend_dir))
 os.environ["BACKEND_ENV"] = "test"
 
 # Import after setting up the path
-from app.db.orm.base_orm import BaseORM
 from app.config import ConfigLoader
 from app.db.database import current_database_session
+from app.db.orm.base_orm import BaseORM
+
+# Pytest plugin registration for fixtures
+pytest_plugins = [
+    "tests.utils.fixtures.user_fixtures",
+    # Add more fixture modules here as needed
+]
 
 
 @pytest.fixture(scope="session")
@@ -59,8 +70,3 @@ def test_session(test_engine: Engine) -> Generator[Session, None, None]:
 def db_session(test_session: Session) -> Session:
     """Alias for test_session for easier use in tests."""
     return test_session
-
-
-pytest_plugins = [
-    "tests.utils.fixtures.item_conftest",
-]

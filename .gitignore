@@ -3,7 +3,11 @@
 .mysql.cache/
 
 # IDE and editor files
-.vscode/*
+.vscode/launch.local.json
+.vscode/.ropeproject/
+
+# Claude Code settings
+.claude/settings.local.json
 
 # Environment files (keep .env.example in version control)
 .env

@@ -38,8 +38,25 @@ class DBConfig(BaseConfig):
 
 
 @dataclass
+class EmailConfig(BaseConfig):
+    username: str = ""
+    password: str = ""
+    from_address: str = ""
+    port: int = 587
+    server: str = "smtp.gmail.com"
+    frontend_url: str = "http://localhost:3000"
+
+    def __post_init__(self):
+        # Only validate if we're not in testing mode
+        # In production, these should be required
+        pass
+
+
+@dataclass
 class AppConfig(BaseConfig):
     db: DBConfig
+    email: EmailConfig
+    secret_key: str
 
     @property
     def endpoint_url(self) -> str:
@@ -74,4 +91,22 @@ class ConfigLoader:
             name=os.getenv("DB_NAME", "ehs_soccer"),
             url=os.getenv("DB_URL", None),
         )
-        cls.config = AppConfig(db=db)
+        email = EmailConfig(
+            username=os.getenv("MAIL_USERNAME", ""),
+            password=os.getenv("MAIL_PASSWORD", ""),
+            from_address=os.getenv("MAIL_FROM", ""),
+            port=int(os.getenv("MAIL_PORT", "587")),
+            server=os.getenv("MAIL_SERVER", "smtp.gmail.com"),
+            frontend_url=os.getenv("FRONTEND_URL", "http://localhost:3000"),
+        )
+        secret_key = os.getenv("SECRET_KEY")
+        if not secret_key:
+            if BACKEND_ENV == "production":
+                raise ValueError("SECRET_KEY must be explicitly set in production")
+            secret_key = "your-secret-key-here-change-in-production"
+        
+        cls.config = AppConfig(
+            db=db,
+            email=email,
+            secret_key=secret_key,
+        )

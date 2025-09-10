@@ -1,8 +1,8 @@
 import json
 import logging
 import time
-from typing import Callable, Awaitable, Any
 import uuid
+from typing import Any, Awaitable, Callable
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -52,25 +52,25 @@ class RequestInterceptorMiddleware(BaseHTTPMiddleware):
             "request_id": request_id,
             "method": request.method,
             "url": str(request.url),
-            "headers": dict(request.headers),
+            "headers": {
+                k: v
+                for k, v in dict(request.headers).items()
+                if k.lower() not in ["authorization", "cookie"]
+            },  # Hide sensitive headers
             "client": f"{request.client.host}:{request.client.port}"
             if request.client
             else "unknown",
             "user_agent": request.headers.get("user-agent", "unknown"),
         }
 
-        # Log request body for POST/PUT/PATCH requests
+        # For body logging, we'll use a different approach that doesn't consume the stream
         if request.method in ["POST", "PUT", "PATCH"]:
-            try:
-                body = await request.body()
-                if body:
-                    # Try to parse JSON, otherwise log as string
-                    try:
-                        request_data["body"] = json.loads(body.decode())
-                    except json.JSONDecodeError:
-                        request_data["body"] = body.decode()
-            except Exception as e:
-                request_data["body_error"] = str(e)
+            content_type = request.headers.get("content-type", "")
+            if "application/json" in content_type:
+                request_data["content_type"] = content_type
+                request_data["has_body"] = True
+            else:
+                request_data["content_type"] = content_type
 
         logging.info(f"🔄 Incoming Request: {json.dumps(request_data, indent=2)}")
 
