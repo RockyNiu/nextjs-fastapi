@@ -42,6 +42,10 @@ jobs:
         working-directory: ./backend
         run: uv sync --dev
 
+      - name: Setup test environment
+        working-directory: ./backend
+        run: cp .env.test.example .env.test
+
       - name: Run linting
         working-directory: ./backend
         run: uv run --with ruff -- ruff check .
@@ -52,10 +56,6 @@ jobs:
 
       - name: Run tests
         working-directory: ./backend
-        env:
-          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
-          SECRET_KEY: test-secret-key-for-ci
-          BACKEND_ENV: testing
         run: uv run --with pytest --with pytest-asyncio -- pytest --tb=short -v
 
   frontend-tests:
