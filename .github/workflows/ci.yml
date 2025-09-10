@@ -48,7 +48,9 @@ jobs:
 
       - name: Run database migrations
         working-directory: ./backend
-        run: uv run --with alembic -- alembic -x sqlalchemy.url=postgresql://postgres:password@localhost:5432/test_db upgrade head
+        run: |
+          export DB_URL="postgresql://postgres:password@localhost:5432/test_db"
+          uv run --with alembic -- alembic upgrade head
 
       - name: Run linting
         working-directory: ./backend
