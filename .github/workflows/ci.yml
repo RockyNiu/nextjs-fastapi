@@ -15,8 +15,8 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_USER: test_user
-          POSTGRES_PASSWORD: test_password
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
           POSTGRES_DB: test_db
         options: >-
           --health-cmd pg_isready
@@ -48,7 +48,7 @@ jobs:
 
       - name: Run database migrations
         working-directory: ./backend
-        run: uv run --with alembic -- alembic -x sqlalchemy.url=postgresql://test_user:test_password@localhost:5432/test_db upgrade head
+        run: uv run --with alembic -- alembic -x sqlalchemy.url=postgresql://postgres:password@localhost:5432/test_db upgrade head
 
       - name: Run linting
         working-directory: ./backend
