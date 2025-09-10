@@ -46,6 +46,10 @@ jobs:
         working-directory: ./backend
         run: cp .env.test.example .env
 
+      - name: Run database migrations
+        working-directory: ./backend
+        run: uv run alembic upgrade head
+
       - name: Run linting
         working-directory: ./backend
         run: uv run --with ruff -- ruff check .
