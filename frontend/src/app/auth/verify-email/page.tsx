@@ -176,16 +176,18 @@ function VerifyEmailContent() {
 
 export default function VerifyEmailPage() {
   return (
-    <Suspense fallback={
-      <Layout>
-        <div className="max-w-md mx-auto mt-20 px-4">
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
+    <Suspense
+      fallback={
+        <Layout>
+          <div className="max-w-md mx-auto mt-20 px-4">
+            <div className="bg-white rounded-lg shadow-md p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading...</p>
+            </div>
           </div>
-        </div>
-      </Layout>
-    }>
+        </Layout>
+      }
+    >
       <VerifyEmailContent />
     </Suspense>
   );
