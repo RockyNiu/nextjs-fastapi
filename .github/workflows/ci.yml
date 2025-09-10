@@ -56,7 +56,7 @@ jobs:
 
       - name: Run tests
         working-directory: ./backend
-        run: uv run --with pytest --with pytest-asyncio -- pytest --tb=short -v
+        run: uv run pytest --tb=short -v
 
   frontend-tests:
     name: Frontend Tests
