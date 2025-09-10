@@ -99,10 +99,14 @@ class ConfigLoader:
             server=os.getenv("MAIL_SERVER", "smtp.gmail.com"),
             frontend_url=os.getenv("FRONTEND_URL", "http://localhost:3000"),
         )
+        secret_key = os.getenv("SECRET_KEY")
+        if not secret_key:
+            if BACKEND_ENV == "production":
+                raise ValueError("SECRET_KEY must be explicitly set in production")
+            secret_key = "your-secret-key-here-change-in-production"
+        
         cls.config = AppConfig(
             db=db,
             email=email,
-            secret_key=os.getenv(
-                "SECRET_KEY", "your-secret-key-here-change-in-production"
-            ),
+            secret_key=secret_key,
         )
