@@ -40,11 +40,11 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./backend
-        run: uv sync --dev
+        run: uv pip install -r requirements.txt
 
       - name: Setup test environment
         working-directory: ./backend
-        run: cp .env.test.example .env
+        run: cp .env.test.example .env.test
 
       - name: Run database migrations
         working-directory: ./backend
