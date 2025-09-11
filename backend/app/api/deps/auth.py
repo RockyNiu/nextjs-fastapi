@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from app.db.orm.user_orm import UserRole
+from app.db.orm.user_role_orm import UserRole
 from app.entities.user import User
 from app.service.user_service import UserService
 
@@ -49,7 +49,7 @@ def get_optional_current_user(
 
 
 def require_admin(current_user: User = Depends(get_current_active_user)) -> User:
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role_id != UserRole.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin access required"
@@ -58,7 +58,7 @@ def require_admin(current_user: User = Depends(get_current_active_user)) -> User
 
 
 def require_moderator_or_admin(current_user: User = Depends(get_current_active_user)) -> User:
-    if current_user.role not in [UserRole.ADMIN, UserRole.MODERATOR]:
+    if current_user.role_id not in [UserRole.ADMIN, UserRole.MODERATOR]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Moderator or admin access required"

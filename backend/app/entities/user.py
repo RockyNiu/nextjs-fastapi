@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr, Field
 
-from app.db.orm.user_orm import UserRole
+from app.db.orm.user_role_orm import UserRole
 
 
 class UserBase(BaseModel):
@@ -11,7 +11,7 @@ class UserBase(BaseModel):
     first_name: str = Field(..., min_length=1, max_length=100)
     last_name: str = Field(..., min_length=1, max_length=100)
     is_active: bool = True
-    role: UserRole = UserRole.USER
+    role_id: UserRole = UserRole.USER
 
 
 class UserCreate(UserBase):
@@ -20,9 +20,9 @@ class UserCreate(UserBase):
 
 class UserUpdate(BaseModel):
     first_name: Optional[str] = Field(None, min_length=1, max_length=100)
-    last_name: Optional[str] = Field(None, min_length=1, max_length=100)
+    last_name: Optional[str] = Field(None, min_length=100)
     is_active: Optional[bool] = None
-    role: Optional[UserRole] = None
+    role_id: Optional[UserRole] = None
 
 
 class User(UserBase):
