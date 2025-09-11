@@ -30,6 +30,7 @@ class UserDAO(BaseDAO):
             first_name=user_create.first_name,
             last_name=user_create.last_name,
             is_active=user_create.is_active,
+            role=user_create.role,
             email_verification_token=self.crypto_service.generate_email_verification_token(),
         )
         self.session.add(db_user)
