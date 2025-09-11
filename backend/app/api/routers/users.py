@@ -33,14 +33,16 @@ router = APIRouter()
 )
 def list_users(
     skip: int = Query(0, ge=0, description="Number of users to skip"),
-    limit: int = Query(100, ge=1, le=1000, description="Maximum number of users to return"),
+    limit: int = Query(
+        100, ge=1, le=1000, description="Maximum number of users to return"
+    ),
 ) -> Any:
     """
     List all users with pagination.
     """
     user_service = UserService()
     users = user_service.get_all_users(skip=skip, limit=limit)
-    
+
     return UserListResponseAPI(
         users=[UserAPI.model_validate(user) for user in users],
         total=len(users),
@@ -70,13 +72,13 @@ def get_user(user_id: int) -> Any:
     """
     user_service = UserService()
     user = user_service.get_user_by_id(user_id)
-    
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
-    
+
     return UserAPI.model_validate(user)
 
 
@@ -86,7 +88,10 @@ def get_user(user_id: int) -> Any:
     dependencies=[Depends(require_admin)],
     responses={
         200: {"description": "User updated successfully"},
-        400: {"model": ErrorResponseAPI, "description": "Bad request - validation error"},
+        400: {
+            "model": ErrorResponseAPI,
+            "description": "Bad request - validation error",
+        },
         403: {
             "model": ErrorResponseAPI,
             "description": "Forbidden - admin access required",
@@ -107,16 +112,16 @@ def update_user(user_id: int, user_update_api: UserUpdateAPI) -> Any:
         is_active=user_update_api.is_active,
         role_id=user_update_api.role_id,
     )
-    
+
     user_service = UserService()
     updated_user = user_service.update_user(user_id, user_update)
-    
+
     if not updated_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
-    
+
     return UserAPI.model_validate(updated_user)
 
 
@@ -141,13 +146,13 @@ def deactivate_user(user_id: int) -> Any:
     """
     user_service = UserService()
     result = user_service.deactivate_user(user_id)
-    
+
     if not result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
-    
+
     return MessageResponseAPI(message="User deactivated successfully", success=True)
 
 
@@ -172,13 +177,13 @@ def activate_user(user_id: int) -> Any:
     """
     user_service = UserService()
     result = user_service.activate_user(user_id)
-    
+
     if not result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
-    
+
     return MessageResponseAPI(message="User activated successfully", success=True)
 
 

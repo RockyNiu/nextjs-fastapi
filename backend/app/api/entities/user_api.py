@@ -239,7 +239,10 @@ class UserListResponseAPI(BaseModel):
     ]
     total: Annotated[
         int,
-        Field(description="Total number of users returned", json_schema_extra={"example": 1}),
+        Field(
+            description="Total number of users returned",
+            json_schema_extra={"example": 1},
+        ),
     ]
     skip: Annotated[
         int,
@@ -247,7 +250,10 @@ class UserListResponseAPI(BaseModel):
     ]
     limit: Annotated[
         int,
-        Field(description="Maximum number of users returned", json_schema_extra={"example": 100}),
+        Field(
+            description="Maximum number of users returned",
+            json_schema_extra={"example": 100},
+        ),
     ]
 
 

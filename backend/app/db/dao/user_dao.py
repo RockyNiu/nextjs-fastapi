@@ -118,7 +118,7 @@ class UserDAO(BaseDAO):
         """Update user information."""
         stmt = select(UserORM).where(UserORM.id == user_id)
         user_orm = self.session.execute(stmt).scalar_one_or_none()
-        
+
         if not user_orm:
             return None
 
