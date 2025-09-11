@@ -13,6 +13,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.middleware import BaseMiddleware, RequestInterceptorMiddleware
 from app.api.routers.auth import router as AuthRouter
+from app.api.routers.users import router as UsersRouter
 
 app = FastAPI()
 
@@ -87,3 +88,4 @@ def get_random():
 
 app.include_router(RootRouter)
 app.include_router(AuthRouter, prefix="/auth", tags=["Authentication"])
+app.include_router(UsersRouter, prefix="/users", tags=["User Management"])

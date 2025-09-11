@@ -1,7 +1,9 @@
 from datetime import datetime
-from typing import Annotated, Optional
+from typing import Annotated, List, Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
+
+from app.db.orm.user_role_orm import UserRole
 
 
 class UserCreateAPI(BaseModel):
@@ -143,6 +145,109 @@ class UserAPI(BaseModel):
             description="Whether the user's email is verified",
             json_schema_extra={"example": True},
         ),
+    ]
+    role_id: Annotated[
+        UserRole,
+        Field(
+            description="User's role ID",
+            json_schema_extra={"example": UserRole.USER},
+        ),
+    ]
+
+
+class UserUpdateAPI(BaseModel):
+    """API model for user update requests from frontend"""
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "first_name": "John",
+                "last_name": "Doe",
+                "is_active": True,
+                "role_id": UserRole.USER,
+            }
+        }
+    )
+
+    first_name: Annotated[
+        Optional[str],
+        Field(
+            default=None,
+            min_length=1,
+            max_length=100,
+            description="User's first name",
+            json_schema_extra={"example": "John"},
+        ),
+    ]
+    last_name: Annotated[
+        Optional[str],
+        Field(
+            default=None,
+            min_length=1,
+            max_length=100,
+            description="User's last name",
+            json_schema_extra={"example": "Doe"},
+        ),
+    ]
+    is_active: Annotated[
+        Optional[bool],
+        Field(
+            default=None,
+            description="Whether the user account is active",
+            json_schema_extra={"example": True},
+        ),
+    ]
+    role_id: Annotated[
+        Optional[UserRole],
+        Field(
+            default=None,
+            description="User's role ID",
+            json_schema_extra={"example": UserRole.USER},
+        ),
+    ]
+
+
+class UserListResponseAPI(BaseModel):
+    """API model for user list responses to frontend"""
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "users": [
+                    {
+                        "id": 1,
+                        "email": "user1@example.com",
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "is_active": True,
+                        "role_id": UserRole.USER,
+                        "date_created": "2025-01-01T12:00:00Z",
+                        "date_updated": "2025-01-01T12:00:00Z",
+                        "email_verified": True,
+                    }
+                ],
+                "total": 1,
+                "skip": 0,
+                "limit": 100,
+            }
+        }
+    )
+
+    users: Annotated[
+        List[UserAPI],
+        Field(description="List of users"),
+    ]
+    total: Annotated[
+        int,
+        Field(description="Total number of users returned", json_schema_extra={"example": 1}),
+    ]
+    skip: Annotated[
+        int,
+        Field(description="Number of users skipped", json_schema_extra={"example": 0}),
+    ]
+    limit: Annotated[
+        int,
+        Field(description="Maximum number of users returned", json_schema_extra={"example": 100}),
     ]
 
 

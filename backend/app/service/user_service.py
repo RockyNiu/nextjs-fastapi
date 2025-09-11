@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Optional
+from typing import List, Optional
 
 from app.common.logger import logger
 from app.db.dao.user_dao import UserDAO
@@ -10,6 +10,7 @@ from app.entities.user import (
     User,
     UserCreate,
     UserLogin,
+    UserUpdate,
     UserWithAccessToken,
 )
 from app.exceptions.user_exceptions import (
@@ -177,3 +178,25 @@ class UserService:
         except Exception as e:
             logger.error(f"Failed to resend verification email to {db_user.email}: {e}")
             raise EmailSendError("Failed to send verification email")
+
+    def get_all_users(self, skip: int = 0, limit: int = 100) -> List[User]:
+        """Get all users with pagination."""
+        return self.user_dao.get_all_users(skip=skip, limit=limit)
+
+    def get_user_by_id(self, user_id: int) -> Optional[User]:
+        """Get user by ID."""
+        return self.user_dao.get_by_id(user_id)
+
+    def update_user(self, user_id: int, user_update: UserUpdate) -> Optional[User]:
+        """Update user information."""
+        return self.user_dao.update_user(user_id, user_update)
+
+    def deactivate_user(self, user_id: int) -> Optional[User]:
+        """Deactivate a user account."""
+        user_update = UserUpdate(is_active=False)
+        return self.user_dao.update_user(user_id, user_update)
+
+    def activate_user(self, user_id: int) -> Optional[User]:
+        """Activate a user account."""
+        user_update = UserUpdate(is_active=True)
+        return self.user_dao.update_user(user_id, user_update)

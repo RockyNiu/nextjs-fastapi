@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 
 from app.db.dao.base_dao import BaseDAO
 from app.db.orm.user_orm import UserORM
-from app.entities.user import User, UserCreate
+from app.entities.user import User, UserCreate, UserUpdate
 from app.service.crypto_service import CryptoService
 
 
@@ -99,3 +99,39 @@ class UserDAO(BaseDAO):
         # This handles the case where the token was already used
         # We can't return the user in this case because we don't know which user it was
         return None
+
+    def get_all_users(self, skip: int = 0, limit: int = 100) -> List[User]:
+        """Get all users with pagination."""
+        stmt = select(UserORM).offset(skip).limit(limit)
+        user_orms = self.session.execute(stmt).scalars().all()
+        return [User.model_validate(user_orm) for user_orm in user_orms]
+
+    def get_by_id(self, user_id: int) -> Optional[User]:
+        """Get user by ID."""
+        stmt = select(UserORM).where(UserORM.id == user_id)
+        user_orm = self.session.execute(stmt).scalar_one_or_none()
+        if user_orm:
+            return User.model_validate(user_orm)
+        return None
+
+    def update_user(self, user_id: int, user_update: UserUpdate) -> Optional[User]:
+        """Update user information."""
+        stmt = select(UserORM).where(UserORM.id == user_id)
+        user_orm = self.session.execute(stmt).scalar_one_or_none()
+        
+        if not user_orm:
+            return None
+
+        # Update fields that are not None
+        if user_update.first_name is not None:
+            user_orm.first_name = user_update.first_name
+        if user_update.last_name is not None:
+            user_orm.last_name = user_update.last_name
+        if user_update.is_active is not None:
+            user_orm.is_active = user_update.is_active
+        if user_update.role_id is not None:
+            user_orm.role_id = user_update.role_id
+
+        user_orm.date_updated = datetime.now(timezone.utc)
+        self.session.flush()
+        return User.model_validate(user_orm)
