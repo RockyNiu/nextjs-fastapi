@@ -51,16 +51,17 @@ def get_optional_current_user(
 def require_admin(current_user: User = Depends(get_current_active_user)) -> User:
     if current_user.role_id != UserRole.ADMIN:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin access required"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required"
         )
     return current_user
 
 
-def require_moderator_or_admin(current_user: User = Depends(get_current_active_user)) -> User:
+def require_moderator_or_admin(
+    current_user: User = Depends(get_current_active_user),
+) -> User:
     if current_user.role_id not in [UserRole.ADMIN, UserRole.MODERATOR]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Moderator or admin access required"
+            detail="Moderator or admin access required",
         )
     return current_user

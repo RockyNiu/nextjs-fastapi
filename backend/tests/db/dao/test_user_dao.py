@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.db.dao.user_dao import UserDAO
 from app.db.orm.user_orm import UserORM
+from app.db.orm.user_role_orm import UserRole
 from app.entities.user import User, UserCreate
 from app.service.crypto_service import CryptoService
 from tests.db.dao.dao_test import DaoTest
@@ -44,6 +45,7 @@ class TestUserDAO(DaoTest):
             first_name="John",
             last_name="Doe",
             is_active=True,
+            role_id=UserRole.USER,
             email_verified=False,
             date_created=datetime.now(timezone.utc),
             date_updated=datetime.now(timezone.utc),
@@ -88,6 +90,7 @@ class TestUserDAO(DaoTest):
             first_name="Jane",
             last_name="Smith",
             is_active=True,
+            role_id=UserRole.USER,
         )
 
         with patch.object(test_session, "add") as mock_add:
@@ -132,6 +135,7 @@ class TestUserDAO(DaoTest):
             first_name="John",
             last_name="Doe",
             is_active=True,
+            role_id=UserRole.USER,
             email_verified=False,
             date_created=datetime.now(timezone.utc),
             date_updated=datetime.now(timezone.utc),
@@ -178,6 +182,7 @@ class TestUserDAO(DaoTest):
             first_name="John",
             last_name="Doe",
             is_active=True,
+            role_id=UserRole.USER,
             email_verified=False,
             date_created=datetime.now(timezone.utc),
             date_updated=datetime.now(timezone.utc),
@@ -203,6 +208,7 @@ class TestUserDAO(DaoTest):
             first_name="John",
             last_name="Doe",
             is_active=True,
+            role_id=UserRole.USER,
             email_verified=False,
             date_created=datetime.now(timezone.utc),
             date_updated=datetime.now(timezone.utc),
@@ -221,6 +227,7 @@ class TestUserDAO(DaoTest):
             first_name="John",
             last_name="Doe",
             is_active=False,
+            role_id=UserRole.USER,
             email_verified=False,
             date_created=datetime.now(timezone.utc),
             date_updated=datetime.now(timezone.utc),
@@ -263,6 +270,7 @@ class TestUserDAO(DaoTest):
             first_name="John",
             last_name="Doe",
             is_active=True,
+            role_id=UserRole.USER,
             email_verified=False,
             password_reset_token="valid_token",
             password_reset_expires=datetime.now(timezone.utc) + timedelta(hours=1),
@@ -329,6 +337,7 @@ class TestUserDAO(DaoTest):
             first_name="John",
             last_name="Doe",
             is_active=True,
+            role_id=UserRole.USER,
             email_verified=False,
             email_verification_token="verification_token",
             date_created=datetime.now(timezone.utc),

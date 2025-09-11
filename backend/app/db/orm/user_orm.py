@@ -23,7 +23,9 @@ class UserORM(BaseORM):
     first_name: Mapped[str] = mapped_column(String(100), nullable=False)
     last_name: Mapped[str] = mapped_column(String(100), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    role_id: Mapped[UserRole] = mapped_column(ForeignKey("ref_user_role.id"), default=UserRole.USER, nullable=False)
+    role_id: Mapped[UserRole] = mapped_column(
+        ForeignKey("ref_user_role.id"), default=UserRole.USER, nullable=False
+    )
     email_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     email_verification_token: Mapped[Optional[str]] = mapped_column(
         String(255), nullable=True
