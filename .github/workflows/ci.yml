@@ -53,6 +53,7 @@ jobs:
       - name: Debug environment
         working-directory: ./backend
         env:
+          BACKEND_ENV: "testing"
           DB_URL: "postgresql://postgres:password@localhost:5432/test_db"
           DB_USER: "postgres"
           DB_PASSWORD: "password"
@@ -60,12 +61,14 @@ jobs:
           DB_PORT: "5432"
           DB_NAME: "test_db"
         run: |
+          echo "BACKEND_ENV: $BACKEND_ENV"
           echo "DB_URL: $DB_URL"
           echo "DB_USER: $DB_USER"
           
       - name: Run database migrations
         working-directory: ./backend
         env:
+          BACKEND_ENV: "testing"
           DB_URL: "postgresql://postgres:password@localhost:5432/test_db"
           DB_USER: "postgres"
           DB_PASSWORD: "password"
@@ -85,6 +88,7 @@ jobs:
       - name: Run tests
         working-directory: ./backend
         env:
+          BACKEND_ENV: "testing"
           DB_URL: "postgresql://postgres:password@localhost:5432/test_db"
           DB_USER: "postgres"
           DB_PASSWORD: "password"
