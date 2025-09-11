@@ -46,7 +46,9 @@ jobs:
 
       - name: Setup test environment
         working-directory: ./backend
-        run: cp .env.test.example .env.test
+        run: |
+          cp .env.test.example .env.test
+          rm -f .env
 
       - name: Debug environment
         working-directory: ./backend
