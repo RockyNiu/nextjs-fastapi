@@ -81,10 +81,11 @@ test-coverage:
     @echo "📊 Running backend tests with coverage..."
     cd {{backend_dir}} && ../.venv/bin/python -m pytest --cov=app --cov-report=html --cov-report=term
 
-# Run frontend tests
+# Build and lint frontend (no tests available)
 test-frontend:
-    @echo "⚛️  Running frontend tests..."
-    cd {{frontend_dir}} && npm test
+    @echo "⚛️  Building and linting frontend..."
+    cd {{frontend_dir}} && npm run build
+    cd {{frontend_dir}} && npm run lint
 
 # ============================================================================
 # Code Quality Commands

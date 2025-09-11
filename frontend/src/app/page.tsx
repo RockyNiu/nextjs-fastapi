@@ -5,7 +5,7 @@ import { authService } from '@/services/authService';
 import { UserAPI } from '@/types/api';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function Home() {
   const router = useRouter();
@@ -13,11 +13,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [verificationSent, setVerificationSent] = useState(false);
 
-  useEffect(() => {
-    checkAuthAndUser();
-  }, [router]);
-
-  const checkAuthAndUser = async () => {
+  const checkAuthAndUser = useCallback(async () => {
     if (authService.isAuthenticated()) {
       try {
         const userData = await authService.getCurrentUser();
@@ -35,7 +31,11 @@ export default function Home() {
       }
     }
     setIsLoading(false);
-  };
+  }, [router]);
+
+  useEffect(() => {
+    checkAuthAndUser();
+  }, [checkAuthAndUser]);
 
   const handleResendVerification = async () => {
     try {

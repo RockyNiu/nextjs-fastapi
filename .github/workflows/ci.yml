@@ -1,0 +1,128 @@
+name: CI/CD Pipeline
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  backend-tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          uv venv
+          uv pip install -r requirements.txt
+
+      - name: Setup test environment
+        working-directory: ./backend
+        run: |
+          cp .env.test.example .env.test
+          rm -f .env
+
+      - name: Debug environment
+        working-directory: ./backend
+        env:
+          BACKEND_ENV: "testing"
+          DB_USER: "postgres"
+          DB_PASSWORD: "password"
+          DB_HOST: "localhost"
+          DB_PORT: "5432"
+          DB_NAME: "test_db"
+        run: |
+          echo "BACKEND_ENV: $BACKEND_ENV"
+          echo "DB_USER: $DB_USER"
+          echo "DB_HOST: $DB_HOST"
+          echo "DB_NAME: $DB_NAME"
+          
+      - name: Run database migrations
+        working-directory: ./backend
+        env:
+          BACKEND_ENV: "testing"
+          DB_USER: "postgres"
+          DB_PASSWORD: "password"
+          DB_HOST: "localhost"
+          DB_PORT: "5432"
+          DB_NAME: "test_db"
+        run: uv run --with alembic -- alembic upgrade head
+
+      - name: Run linting
+        working-directory: ./backend
+        run: uv run --with ruff -- ruff check .
+
+      - name: Run formatting check
+        working-directory: ./backend
+        run: uv run --with ruff -- ruff format --check .
+
+      - name: Run tests
+        working-directory: ./backend
+        env:
+          BACKEND_ENV: "testing"
+          DB_USER: "postgres"
+          DB_PASSWORD: "password"
+          DB_HOST: "localhost"
+          DB_PORT: "5432"
+          DB_NAME: "test_db"
+        run: uv run --with pytest --with pytest-asyncio --with httpx -- pytest --tb=short -v
+
+  frontend-tests:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: ./frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run linting
+        working-directory: ./frontend
+        run: npm run lint
+
+      - name: Run formatting check
+        working-directory: ./frontend
+        run: npx prettier --check .
+
+      - name: Build application
+        working-directory: ./frontend
+        run: npm run build
+

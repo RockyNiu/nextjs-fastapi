@@ -60,7 +60,11 @@ class ApiService {
         headers = this.getHeaders('', requiresAuth);
         body = data;
       } else if (data) {
-        if (typeof data === 'object' && data !== null && data.constructor === Object) {
+        if (
+          typeof data === 'object' &&
+          data !== null &&
+          data.constructor === Object
+        ) {
           // Only convert plain objects to snake_case
           const snakeCaseData = toSnakeCaseKeys(data);
           body = JSON.stringify(snakeCaseData);

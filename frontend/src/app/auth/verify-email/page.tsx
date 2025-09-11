@@ -4,9 +4,9 @@ import Layout from '@/components/layout/Layout';
 import { authService } from '@/services/authService';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
@@ -69,7 +69,7 @@ export default function VerifyEmailPage() {
     };
 
     verifyEmail();
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   return (
     <Layout>
@@ -171,5 +171,24 @@ export default function VerifyEmailPage() {
         </div>
       </div>
     </Layout>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense
+      fallback={
+        <Layout>
+          <div className="max-w-md mx-auto mt-20 px-4">
+            <div className="bg-white rounded-lg shadow-md p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading...</p>
+            </div>
+          </div>
+        </Layout>
+      }
+    >
+      <VerifyEmailContent />
+    </Suspense>
   );
 }

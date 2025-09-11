@@ -1,0 +1,54 @@
+name: Staging Deployment
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    environment: staging
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: uv sync --dev
+
+      - name: Setup staging environment
+        working-directory: ./backend
+        run: |
+          cat > .env << EOF
+          BACKEND_ENV=staging
+          DB_URL=${{ secrets.STAGING_DATABASE_URL }}
+          SECRET_KEY=${{ secrets.STAGING_SECRET_KEY }}
+          MAIL_USERNAME=${{ secrets.STAGING_MAIL_USERNAME }}
+          MAIL_PASSWORD=${{ secrets.STAGING_MAIL_PASSWORD }}
+          MAIL_FROM=${{ secrets.STAGING_MAIL_FROM }}
+          MAIL_SERVER=${{ secrets.STAGING_MAIL_SERVER }}
+          FRONTEND_URL=${{ secrets.STAGING_FRONTEND_URL }}
+          EOF
+
+      - name: Run database migrations
+        working-directory: ./backend
+        run: uv run alembic upgrade head
+
+      - name: Run integration tests
+        working-directory: ./backend
+        run: uv run --with pytest --with pytest-asyncio --with httpx -- pytest tests/integration/ --tb=short -v
+
+      # Add deployment steps here (Docker, AWS, etc.)
+      - name: Deploy to staging
+        run: echo "Deploy to staging server here"

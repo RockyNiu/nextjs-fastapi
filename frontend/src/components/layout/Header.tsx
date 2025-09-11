@@ -3,7 +3,7 @@
 import { authService } from '@/services/authService';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface HeaderProps {
   onAuthChange?: (isAuthenticated: boolean) => void;
@@ -14,18 +14,18 @@ export default function Header({ onAuthChange }: HeaderProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
-  const checkAuthStatus = () => {
+  const checkAuthStatus = useCallback(() => {
     const authenticated = authService.isAuthenticated();
     setIsAuthenticated(authenticated);
     setIsLoading(false);
     if (onAuthChange) {
       onAuthChange(authenticated);
     }
-  };
+  }, [onAuthChange]);
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, [checkAuthStatus]);
 
   const handleLogout = async () => {
     try {

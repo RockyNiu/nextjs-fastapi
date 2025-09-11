@@ -104,7 +104,7 @@ class ConfigLoader:
             if BACKEND_ENV == "production":
                 raise ValueError("SECRET_KEY must be explicitly set in production")
             secret_key = "your-secret-key-here-change-in-production"
-        
+
         cls.config = AppConfig(
             db=db,
             email=email,
