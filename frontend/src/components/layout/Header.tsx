@@ -1,6 +1,7 @@
 'use client';
 
 import { authService } from '@/services/authService';
+import { UserAPI, UserRole } from '@/types/api';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -13,10 +14,24 @@ export default function Header({ onAuthChange }: HeaderProps) {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState<UserAPI | null>(null);
 
-  const checkAuthStatus = useCallback(() => {
+  const checkAuthStatus = useCallback(async () => {
     const authenticated = authService.isAuthenticated();
     setIsAuthenticated(authenticated);
+
+    if (authenticated) {
+      try {
+        const user = await authService.getCurrentUser();
+        setCurrentUser(user);
+      } catch (error) {
+        console.error('Failed to get current user:', error);
+        setCurrentUser(null);
+      }
+    } else {
+      setCurrentUser(null);
+    }
+
     setIsLoading(false);
     if (onAuthChange) {
       onAuthChange(authenticated);
@@ -31,6 +46,7 @@ export default function Header({ onAuthChange }: HeaderProps) {
     try {
       await authService.logout();
       setIsAuthenticated(false);
+      setCurrentUser(null);
       if (onAuthChange) {
         onAuthChange(false);
       }
@@ -39,6 +55,11 @@ export default function Header({ onAuthChange }: HeaderProps) {
       console.error('Logout failed:', error);
     }
   };
+
+  const canAccessAdmin =
+    currentUser &&
+    (currentUser.roleId === UserRole.ADMIN ||
+      currentUser.roleId === UserRole.MODERATOR);
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
@@ -61,12 +82,22 @@ export default function Header({ onAuthChange }: HeaderProps) {
               Home
             </Link>
             {isAuthenticated && (
-              <Link
-                href="/dashboard"
-                className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Dashboard
-              </Link>
+              <>
+                <Link
+                  href="/dashboard"
+                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Dashboard
+                </Link>
+                {canAccessAdmin && (
+                  <Link
+                    href="/admin/users"
+                    className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Admin
+                  </Link>
+                )}
+              </>
             )}
           </nav>
 
