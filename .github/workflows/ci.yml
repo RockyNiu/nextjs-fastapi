@@ -48,6 +48,16 @@ jobs:
         working-directory: ./backend
         run: |
           cp .env.test.example .env.test
+          
+      - name: Run migrations
+        working-directory: ./backend
+        run: |
+          export DB_USER=postgres
+          export DB_PASSWORD=password
+          export DB_HOST=localhost
+          export DB_PORT=5432
+          export DB_NAME=test_db
+          uv run alembic upgrade head
           rm -f .env
 
       - name: Debug environment
