@@ -1,10 +1,14 @@
 from logging.config import fileConfig
 
+from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 from app.db.database import DatabaseManager
 from app.db.orm.base_orm import BaseORM
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Import all ORM models so they are registered with metadata
 
