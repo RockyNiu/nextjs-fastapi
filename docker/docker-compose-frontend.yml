@@ -11,4 +11,6 @@ services:
       - 3000:3000
     volumes:
       - ../frontend:/app
+    environment:
+      - NEXT_TELEMETRY_DISABLED=1
     command: npm run dev
