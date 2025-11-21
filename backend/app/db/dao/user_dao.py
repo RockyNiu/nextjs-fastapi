@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 
-from sqlalchemy import and_, select
+from sqlalchemy import and_, func, select
 from sqlalchemy.orm import Session
 
 from app.db.dao.base_dao import BaseDAO
@@ -105,6 +105,11 @@ class UserDAO(BaseDAO):
         stmt = select(UserORM).offset(skip).limit(limit)
         user_orms = self.session.execute(stmt).scalars().all()
         return [User.model_validate(user_orm) for user_orm in user_orms]
+
+    def count_all(self) -> int:
+        """Get total count of all users."""
+        stmt = select(func.count()).select_from(UserORM)
+        return self.session.execute(stmt).scalar() or 0
 
     def get_by_id(self, user_id: int) -> Optional[User]:
         """Get user by ID."""

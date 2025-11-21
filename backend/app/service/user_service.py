@@ -183,6 +183,10 @@ class UserService:
         """Get all users with pagination."""
         return self.user_dao.get_all_users(skip=skip, limit=limit)
 
+    def get_total_users_count(self) -> int:
+        """Get total count of all users."""
+        return self.user_dao.count_all()
+
     def get_user_by_id(self, user_id: int) -> Optional[User]:
         """Get user by ID."""
         return self.user_dao.get_by_id(user_id)

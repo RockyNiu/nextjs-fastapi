@@ -18,6 +18,31 @@ router = APIRouter()
 
 
 @router.get(
+    "/roles/",
+    response_model=List[dict],
+    dependencies=[Depends(require_moderator_or_admin)],
+    responses={
+        200: {"description": "Available user roles"},
+        403: {
+            "model": ErrorResponseAPI,
+            "description": "Forbidden - insufficient permissions",
+        },
+    },
+    summary="Get available roles",
+    description="Get list of available user roles. Requires moderator or admin role.",
+)
+def get_roles() -> Any:
+    """
+    Get available user roles.
+    """
+    return [
+        {"id": UserRole.USER, "name": "user", "display_name": "User"},
+        {"id": UserRole.MODERATOR, "name": "moderator", "display_name": "Moderator"},
+        {"id": UserRole.ADMIN, "name": "admin", "display_name": "Admin"},
+    ]
+
+
+@router.get(
     "/",
     response_model=UserListResponseAPI,
     dependencies=[Depends(require_moderator_or_admin)],
@@ -186,28 +211,3 @@ def activate_user(user_id: int) -> Any:
         )
 
     return MessageResponseAPI(message="User activated successfully", success=True)
-
-
-@router.get(
-    "/roles/",
-    response_model=List[dict],
-    dependencies=[Depends(require_moderator_or_admin)],
-    responses={
-        200: {"description": "Available user roles"},
-        403: {
-            "model": ErrorResponseAPI,
-            "description": "Forbidden - insufficient permissions",
-        },
-    },
-    summary="Get available roles",
-    description="Get list of available user roles. Requires moderator or admin role.",
-)
-def get_roles() -> Any:
-    """
-    Get available user roles.
-    """
-    return [
-        {"id": UserRole.USER, "name": "user", "display_name": "User"},
-        {"id": UserRole.MODERATOR, "name": "moderator", "display_name": "Moderator"},
-        {"id": UserRole.ADMIN, "name": "admin", "display_name": "Admin"},
-    ]
