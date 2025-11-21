@@ -261,22 +261,36 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
                   Previous
                 </button>
 
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  const page = i + 1;
-                  return (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                        currentPage === page
-                          ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                          : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  );
-                })}
+                {(() => {
+                  // Calculate start and end page numbers for pagination window
+                  let startPage = Math.max(1, currentPage - 2);
+                  let endPage = Math.min(totalPages, currentPage + 2);
+                  // Adjust if less than 5 pages are shown
+                  if (endPage - startPage < 4) {
+                    if (startPage === 1) {
+                      endPage = Math.min(totalPages, startPage + 4);
+                    } else if (endPage === totalPages) {
+                      startPage = Math.max(1, endPage - 4);
+                    }
+                  }
+                  const pages = [];
+                  for (let page = startPage; page <= endPage; page++) {
+                    pages.push(
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                          currentPage === page
+                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  }
+                  return pages;
+                })()}
 
                 <button
                   onClick={() =>
