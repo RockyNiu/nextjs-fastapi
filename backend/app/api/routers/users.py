@@ -42,10 +42,11 @@ def list_users(
     """
     user_service = UserService()
     users = user_service.get_all_users(skip=skip, limit=limit)
+    total_users_count = user_service.get_total_users_count()
 
     return UserListResponseAPI(
         users=[UserAPI.model_validate(user) for user in users],
-        total=len(users),
+        total=total_users_count,
         skip=skip,
         limit=limit,
     )
