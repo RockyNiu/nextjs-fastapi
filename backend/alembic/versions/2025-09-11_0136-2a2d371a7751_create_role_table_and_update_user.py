@@ -1,7 +1,7 @@
 """create_role_table_and_update_user
 
 Revision ID: 2a2d371a7751
-Revises: cba5ca50848d
+Revises: 659bcbfc978e
 Create Date: 2025-09-11 01:36:27.967875
 
 """
