@@ -13,13 +13,34 @@ export interface RoleOption {
   display_name: string;
 }
 
+export interface UserFilters {
+  search?: string;
+  roleId?: UserRole | null;
+  isActive?: boolean | null;
+}
+
 class UserService {
   async getAllUsers(
     skip: number = 0,
-    limit: number = 100
+    limit: number = 100,
+    filters?: UserFilters
   ): Promise<UserListResponseAPI> {
+    const params = new URLSearchParams();
+    params.append('skip', skip.toString());
+    params.append('limit', limit.toString());
+
+    if (filters?.search) {
+      params.append('search', filters.search);
+    }
+    if (filters?.roleId != null) {
+      params.append('role_id', filters.roleId.toString());
+    }
+    if (filters?.isActive != null) {
+      params.append('is_active', filters.isActive.toString());
+    }
+
     const response = await apiService.request<UserListResponseAPI>({
-      endpoint: `/users/?skip=${skip}&limit=${limit}`,
+      endpoint: `/users/?${params.toString()}`,
       method: 'GET',
       requiresAuth: true,
     });

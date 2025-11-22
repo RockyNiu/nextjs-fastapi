@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 
-from sqlalchemy import and_, func, select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.db.dao.base_dao import BaseDAO
@@ -110,6 +110,62 @@ class UserDAO(BaseDAO):
         """Get total count of all users."""
         stmt = select(func.count()).select_from(UserORM)
         return self.session.execute(stmt).scalar() or 0
+
+    def get_users_filtered(
+        self,
+        skip: int = 0,
+        limit: int = 100,
+        search: Optional[str] = None,
+        role_id: Optional[int] = None,
+        is_active: Optional[bool] = None,
+    ) -> tuple[List[User], int]:
+        """Get users with filtering and pagination.
+
+        Args:
+            skip: Number of records to skip
+            limit: Maximum number of records to return
+            search: Search term for name or email (case-insensitive)
+            role_id: Filter by role ID
+            is_active: Filter by active status
+
+        Returns:
+            Tuple of (list of users, total count matching filters)
+        """
+        # Build base query
+        conditions = []
+
+        if search:
+            search_term = f"%{search.lower()}%"
+            conditions.append(
+                or_(
+                    func.lower(UserORM.email).like(search_term),
+                    func.lower(UserORM.first_name).like(search_term),
+                    func.lower(UserORM.last_name).like(search_term),
+                )
+            )
+
+        if role_id is not None:
+            conditions.append(UserORM.role_id == role_id)
+
+        if is_active is not None:
+            conditions.append(UserORM.is_active == is_active)
+
+        # Get total count with filters
+        count_stmt = select(func.count()).select_from(UserORM)
+        if conditions:
+            count_stmt = count_stmt.where(and_(*conditions))
+        total_count = self.session.execute(count_stmt).scalar() or 0
+
+        # Get paginated results
+        query_stmt = select(UserORM)
+        if conditions:
+            query_stmt = query_stmt.where(and_(*conditions))
+        query_stmt = query_stmt.offset(skip).limit(limit)
+
+        user_orms = self.session.execute(query_stmt).scalars().all()
+        users = [User.model_validate(user_orm) for user_orm in user_orms]
+
+        return users, total_count
 
     def get_by_id(self, user_id: int) -> Optional[User]:
         """Get user by ID."""

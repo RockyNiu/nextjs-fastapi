@@ -187,6 +187,34 @@ class UserService:
         """Get total count of all users."""
         return self.user_dao.count_all()
 
+    def get_users_filtered(
+        self,
+        skip: int = 0,
+        limit: int = 100,
+        search: Optional[str] = None,
+        role_id: Optional[int] = None,
+        is_active: Optional[bool] = None,
+    ) -> tuple[List[User], int]:
+        """Get users with filtering and pagination.
+
+        Args:
+            skip: Number of records to skip
+            limit: Maximum number of records to return
+            search: Search term for name or email (case-insensitive)
+            role_id: Filter by role ID
+            is_active: Filter by active status
+
+        Returns:
+            Tuple of (list of users, total count matching filters)
+        """
+        return self.user_dao.get_users_filtered(
+            skip=skip,
+            limit=limit,
+            search=search,
+            role_id=role_id,
+            is_active=is_active,
+        )
+
     def get_user_by_id(self, user_id: int) -> Optional[User]:
         """Get user by ID."""
         return self.user_dao.get_by_id(user_id)
@@ -228,8 +256,6 @@ class UserService:
 
         # If email should be pre-verified, update it
         if email_verified:
-            user_update = UserUpdate()
-            # We need to directly update the ORM since UserUpdate doesn't have email_verified
             self.user_dao.set_email_verified(user.id, True)
             user = self.user_dao.get_by_id(user.id)
 

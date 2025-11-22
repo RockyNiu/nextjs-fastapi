@@ -1,8 +1,8 @@
 'use client';
 
-import { userService } from '@/services/userService';
+import { UserFilters, userService } from '@/services/userService';
 import { UserAPI, UserRole } from '@/types/api';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import UserEditModal from './UserEditModal';
 import UserList from './UserList';
@@ -28,24 +28,66 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
   const [totalUsers, setTotalUsers] = useState(0);
   const usersPerPage = 10;
 
-  const loadUsers = async (page: number = 1) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const skip = (page - 1) * usersPerPage;
-      const response = await userService.getAllUsers(skip, usersPerPage);
-      setUsers(response.users);
-      setTotalUsers(response.total);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load users');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const loadUsers = useCallback(
+    async (
+      page: number = 1,
+      search?: string,
+      role?: UserRole | 'all',
+      status?: 'all' | 'active' | 'inactive'
+    ) => {
+      try {
+        setLoading(true);
+        setError(null);
+        const skip = (page - 1) * usersPerPage;
 
+        // Build filters
+        const filters: UserFilters = {};
+        if (search) {
+          filters.search = search;
+        }
+        if (role && role !== 'all') {
+          filters.roleId = role;
+        }
+        if (status && status !== 'all') {
+          filters.isActive = status === 'active';
+        }
+
+        const response = await userService.getAllUsers(
+          skip,
+          usersPerPage,
+          filters
+        );
+        setUsers(response.users);
+        setTotalUsers(response.total);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load users');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [usersPerPage]
+  );
+
+  // Debounced search term that triggers API calls
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+
+  // Debounce the search term
   useEffect(() => {
-    loadUsers(currentPage);
-  }, [currentPage]);
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      // Reset to page 1 when search changes
+      if (searchTerm !== debouncedSearchTerm) {
+        setCurrentPage(1);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, debouncedSearchTerm]);
+
+  // Load users when page or filters change
+  useEffect(() => {
+    loadUsers(currentPage, debouncedSearchTerm, roleFilter, statusFilter);
+  }, [currentPage, debouncedSearchTerm, roleFilter, statusFilter, loadUsers]);
 
   const handleEditUser = (user: UserAPI) => {
     setSelectedUser(user);
@@ -70,7 +112,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
         await userService.activateUser(user.id);
         toast.success('User activated');
       }
-      await loadUsers(currentPage);
+      await loadUsers(currentPage, searchTerm, roleFilter, statusFilter);
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : 'Failed to update user status'
@@ -80,35 +122,17 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
-    // In a real app, you'd want to implement server-side search
-    // For now, this is just for UI demonstration
   };
 
   const handleRoleFilter = (role: UserRole | 'all') => {
     setRoleFilter(role);
-    // In a real app, you'd want to implement server-side filtering
+    setCurrentPage(1); // Reset to first page when filter changes
   };
 
   const handleStatusFilter = (status: 'all' | 'active' | 'inactive') => {
     setStatusFilter(status);
-    // In a real app, you'd want to implement server-side filtering
+    setCurrentPage(1); // Reset to first page when filter changes
   };
-
-  // Filter users based on search term, role, and status
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesRole = roleFilter === 'all' || user.roleId === roleFilter;
-    const matchesStatus =
-      statusFilter === 'all' ||
-      (statusFilter === 'active' && user.isActive) ||
-      (statusFilter === 'inactive' && !user.isActive);
-
-    return matchesSearch && matchesRole && matchesStatus;
-  });
 
   const totalPages = Math.ceil(totalUsers / usersPerPage);
 
@@ -208,7 +232,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
 
       {/* User List */}
       <UserList
-        users={filteredUsers}
+        users={users}
         currentUser={currentUser}
         onEditUser={handleEditUser}
         onToggleUserStatus={handleToggleUserStatus}

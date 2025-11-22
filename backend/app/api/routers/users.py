@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
@@ -54,24 +54,36 @@ def get_roles() -> Any:
         },
     },
     summary="List all users",
-    description="Get a paginated list of all users. Requires moderator or admin role.",
+    description="Get a paginated and filtered list of all users. Requires moderator or admin role.",
 )
 def list_users(
     skip: int = Query(0, ge=0, description="Number of users to skip"),
     limit: int = Query(
         100, ge=1, le=1000, description="Maximum number of users to return"
     ),
+    search: Optional[str] = Query(
+        None, description="Search by name or email (case-insensitive)"
+    ),
+    role_id: Optional[int] = Query(
+        None, description="Filter by role ID (1=User, 2=Moderator, 3=Admin)"
+    ),
+    is_active: Optional[bool] = Query(None, description="Filter by active status"),
 ) -> Any:
     """
-    List all users with pagination.
+    List all users with pagination and filtering.
     """
     user_service = UserService()
-    users = user_service.get_all_users(skip=skip, limit=limit)
-    total_users_count = user_service.get_total_users_count()
+    users, total_count = user_service.get_users_filtered(
+        skip=skip,
+        limit=limit,
+        search=search,
+        role_id=role_id,
+        is_active=is_active,
+    )
 
     return UserListResponseAPI(
         users=[UserAPI.model_validate(user) for user in users],
-        total=total_users_count,
+        total=total_count,
         skip=skip,
         limit=limit,
     )
