@@ -180,11 +180,23 @@ class UserService:
             raise EmailSendError("Failed to send verification email")
 
     def get_all_users(self, skip: int = 0, limit: int = 100) -> List[User]:
-        """Get all users with pagination."""
+        """Get all users with pagination.
+
+        Args:
+            skip: Number of records to skip for pagination. Defaults to 0.
+            limit: Maximum number of records to return. Defaults to 100.
+
+        Returns:
+            List of User objects.
+        """
         return self.user_dao.get_all_users(skip=skip, limit=limit)
 
     def get_total_users_count(self) -> int:
-        """Get total count of all users."""
+        """Get total count of all users in the database.
+
+        Returns:
+            Total number of users.
+        """
         return self.user_dao.count_all()
 
     def get_users_filtered(
@@ -216,20 +228,56 @@ class UserService:
         )
 
     def get_user_by_id(self, user_id: int) -> Optional[User]:
-        """Get user by ID."""
+        """Get a user by their unique identifier.
+
+        Args:
+            user_id: The unique identifier of the user.
+
+        Returns:
+            User object if found, None otherwise.
+        """
         return self.user_dao.get_by_id(user_id)
 
     def update_user(self, user_id: int, user_update: UserUpdate) -> Optional[User]:
-        """Update user information."""
+        """Update user information.
+
+        Args:
+            user_id: The unique identifier of the user to update.
+            user_update: UserUpdate object containing the fields to update.
+                Only non-None fields will be updated.
+
+        Returns:
+            Updated User object if found, None if user not found.
+        """
         return self.user_dao.update_user(user_id, user_update)
 
     def deactivate_user(self, user_id: int) -> Optional[User]:
-        """Deactivate a user account."""
+        """Deactivate a user account.
+
+        Sets the user's is_active status to False, preventing them from
+        logging in or accessing protected resources.
+
+        Args:
+            user_id: The unique identifier of the user to deactivate.
+
+        Returns:
+            Updated User object if found, None if user not found.
+        """
         user_update = UserUpdate(is_active=False)
         return self.user_dao.update_user(user_id, user_update)
 
     def activate_user(self, user_id: int) -> Optional[User]:
-        """Activate a user account."""
+        """Activate a user account.
+
+        Sets the user's is_active status to True, allowing them to
+        log in and access protected resources.
+
+        Args:
+            user_id: The unique identifier of the user to activate.
+
+        Returns:
+            Updated User object if found, None if user not found.
+        """
         user_update = UserUpdate(is_active=True)
         return self.user_dao.update_user(user_id, user_update)
 

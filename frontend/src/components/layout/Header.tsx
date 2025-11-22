@@ -213,13 +213,6 @@ export default function Header({ onAuthChange }: HeaderProps) {
                       Admin
                     </Link>
                   )}
-                  <Link
-                    href="/dashboard"
-                    className="text-gray-700 hover:text-blue-600 hover:bg-gray-50 block px-3 py-2 rounded-md text-base font-medium"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Profile
-                  </Link>
                   <button
                     onClick={() => {
                       handleLogout();
