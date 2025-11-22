@@ -2,7 +2,7 @@
 
 import { userService } from '@/services/userService';
 import { UserAPI, UserRole } from '@/types/api';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import UserEditModal from './UserEditModal';
 import UserList from './UserList';
@@ -262,33 +262,82 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
                 </button>
 
                 {(() => {
-                  // Calculate start and end page numbers for pagination window
-                  let startPage = Math.max(1, currentPage - 2);
-                  let endPage = Math.min(totalPages, currentPage + 2);
-                  // Adjust if less than 5 pages are shown
-                  if (endPage - startPage < 4) {
-                    if (startPage === 1) {
-                      endPage = Math.min(totalPages, startPage + 4);
-                    } else if (endPage === totalPages) {
-                      startPage = Math.max(1, endPage - 4);
-                    }
+                  const pages: React.ReactNode[] = [];
+                  const pageButtonClass = (page: number) =>
+                    `relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                      currentPage === page
+                        ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                    }`;
+                  const ellipsisClass =
+                    'relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700';
+
+                  // Always show first page
+                  pages.push(
+                    <button
+                      key={1}
+                      onClick={() => setCurrentPage(1)}
+                      className={pageButtonClass(1)}
+                    >
+                      1
+                    </button>
+                  );
+
+                  // Show left ellipsis if needed
+                  if (currentPage > 4) {
+                    pages.push(
+                      <span key="left-ellipsis" className={ellipsisClass}>
+                        ...
+                      </span>
+                    );
                   }
-                  const pages = [];
+
+                  // Show pages around current page
+                  const startPage = Math.max(2, currentPage - 1);
+                  const endPage = Math.min(totalPages - 1, currentPage + 1);
+
                   for (let page = startPage; page <= endPage; page++) {
+                    // Skip if already showing as first or last page
+                    if (page === 1 || page === totalPages) continue;
+                    // Skip pages too close to first page when we're showing ellipsis
+                    if (currentPage > 4 && page < currentPage - 1) continue;
+                    // Skip pages too close to last page when we're showing ellipsis
+                    if (currentPage < totalPages - 3 && page > currentPage + 1)
+                      continue;
+
                     pages.push(
                       <button
                         key={page}
                         onClick={() => setCurrentPage(page)}
-                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                          currentPage === page
-                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                        }`}
+                        className={pageButtonClass(page)}
                       >
                         {page}
                       </button>
                     );
                   }
+
+                  // Show right ellipsis if needed
+                  if (currentPage < totalPages - 3) {
+                    pages.push(
+                      <span key="right-ellipsis" className={ellipsisClass}>
+                        ...
+                      </span>
+                    );
+                  }
+
+                  // Always show last page if more than 1 page
+                  if (totalPages > 1) {
+                    pages.push(
+                      <button
+                        key={totalPages}
+                        onClick={() => setCurrentPage(totalPages)}
+                        className={pageButtonClass(totalPages)}
+                      >
+                        {totalPages}
+                      </button>
+                    );
+                  }
+
                   return pages;
                 })()}
 
