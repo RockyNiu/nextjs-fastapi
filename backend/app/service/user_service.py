@@ -204,3 +204,55 @@ class UserService:
         """Activate a user account."""
         user_update = UserUpdate(is_active=True)
         return self.user_dao.update_user(user_id, user_update)
+
+    def create_user_without_verification(
+        self, user_create: UserCreate, email_verified: bool = False
+    ) -> User:
+        """Create a user without sending verification email.
+
+        Useful for seeding test/dummy users.
+
+        Args:
+            user_create: User creation data
+            email_verified: Whether to mark the email as already verified
+
+        Returns:
+            The created user
+        """
+        # Check if user already exists
+        if self.user_dao.get_by_email(user_create.email):
+            raise UserAlreadyExistsError("Email already registered")
+
+        # Create user (this sets email_verification_token in DAO)
+        user = self.user_dao.create_user(user_create)
+
+        # If email should be pre-verified, update it
+        if email_verified:
+            user_update = UserUpdate()
+            # We need to directly update the ORM since UserUpdate doesn't have email_verified
+            self.user_dao.set_email_verified(user.id, True)
+            user = self.user_dao.get_by_id(user.id)
+
+        return user
+
+    def get_users_by_email_domain(self, domain: str) -> List[User]:
+        """Get all users with emails matching a domain pattern.
+
+        Args:
+            domain: Email domain to match (e.g., "@dummyuser.com")
+
+        Returns:
+            List of users with matching email domain
+        """
+        return self.user_dao.get_users_by_email_domain(domain)
+
+    def delete_user(self, user_id: int) -> bool:
+        """Delete a user by ID.
+
+        Args:
+            user_id: ID of the user to delete
+
+        Returns:
+            True if user was deleted, False if not found
+        """
+        return self.user_dao.delete_user(user_id)

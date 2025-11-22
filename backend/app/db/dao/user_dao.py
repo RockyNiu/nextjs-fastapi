@@ -140,3 +140,36 @@ class UserDAO(BaseDAO):
         user_orm.date_updated = datetime.now(timezone.utc)
         self.session.flush()
         return User.model_validate(user_orm)
+
+    def set_email_verified(self, user_id: int, verified: bool) -> Optional[User]:
+        """Set the email verified status for a user."""
+        stmt = select(UserORM).where(UserORM.id == user_id)
+        user_orm = self.session.execute(stmt).scalar_one_or_none()
+
+        if not user_orm:
+            return None
+
+        user_orm.email_verified = verified
+        if verified:
+            user_orm.email_verification_token = None
+        user_orm.date_updated = datetime.now(timezone.utc)
+        self.session.flush()
+        return User.model_validate(user_orm)
+
+    def get_users_by_email_domain(self, domain: str) -> List[User]:
+        """Get all users with emails matching a domain pattern."""
+        stmt = select(UserORM).where(UserORM.email.like(f"%{domain}"))
+        user_orms = self.session.execute(stmt).scalars().all()
+        return [User.model_validate(user_orm) for user_orm in user_orms]
+
+    def delete_user(self, user_id: int) -> bool:
+        """Delete a user by ID."""
+        stmt = select(UserORM).where(UserORM.id == user_id)
+        user_orm = self.session.execute(stmt).scalar_one_or_none()
+
+        if not user_orm:
+            return False
+
+        self.session.delete(user_orm)
+        self.session.flush()
+        return True

@@ -35,6 +35,21 @@ dev-frontend:
 # Database Commands
 # ============================================================================
 
+# Seed dummy users for testing
+seed-users:
+    @echo "🌱 Seeding dummy users..."
+    cd {{backend_dir}} && uv run python scripts/seed_dummy_users.py
+
+# Clean up dummy users (only removes @dummy.test users)
+clean-users:
+    @echo "🧹 Cleaning dummy users..."
+    cd {{backend_dir}} && uv run python scripts/clean_dummy_users.py
+
+# Preview which dummy users would be deleted (dry run)
+clean-users-dry:
+    @echo "🔍 Preview: dummy users that would be deleted..."
+    cd {{backend_dir}} && uv run python scripts/clean_dummy_users.py --dry-run
+
 # Run database migrations
 migrate:
     @echo "🗄️  Running database migrations..."
