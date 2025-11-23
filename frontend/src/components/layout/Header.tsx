@@ -18,24 +18,27 @@ export default function Header({ onAuthChange }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const checkAuthStatus = useCallback(async () => {
-    const authenticated = authService.isAuthenticated();
-    setIsAuthenticated(authenticated);
+    try {
+      const authenticated = authService.isAuthenticated();
+      setIsAuthenticated(authenticated);
 
-    if (authenticated) {
-      try {
-        const user = await authService.getCurrentUser();
-        setCurrentUser(user);
-      } catch (error) {
-        console.error('Failed to get current user:', error);
+      if (authenticated) {
+        try {
+          const user = await authService.getCurrentUser();
+          setCurrentUser(user);
+        } catch (error) {
+          console.error('Failed to get current user:', error);
+          setCurrentUser(null);
+        }
+      } else {
         setCurrentUser(null);
       }
-    } else {
-      setCurrentUser(null);
-    }
 
-    setIsLoading(false);
-    if (onAuthChange) {
-      onAuthChange(authenticated);
+      if (onAuthChange) {
+        onAuthChange(authenticated);
+      }
+    } finally {
+      setIsLoading(false);
     }
   }, [onAuthChange]);
 
