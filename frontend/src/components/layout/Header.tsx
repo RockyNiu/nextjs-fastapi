@@ -1,7 +1,7 @@
 'use client';
 
 import { authService } from '@/services/authService';
-import { UserAPI, UserRole } from '@/types/api';
+import { UserAPI } from '@/types/api';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -62,8 +62,7 @@ export default function Header({ onAuthChange }: HeaderProps) {
 
   const canAccessAdmin =
     currentUser &&
-    (currentUser.roleId === UserRole.ADMIN ||
-      currentUser.roleId === UserRole.MODERATOR);
+    (currentUser.role === 'admin' || currentUser.role === 'moderator');
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">

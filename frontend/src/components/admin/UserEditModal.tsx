@@ -1,8 +1,15 @@
 'use client';
 
 import { RoleOption, userService } from '@/services/userService';
-import { UserAPI, UserRole, UserUpdateAPI } from '@/types/api';
+import { RoleName, UserAPI, UserUpdateAPI } from '@/types/api';
 import { useEffect, useState } from 'react';
+
+interface FormData {
+  firstName: string;
+  lastName: string;
+  isActive: boolean;
+  role: RoleName;
+}
 
 interface UserEditModalProps {
   user: UserAPI;
@@ -17,11 +24,11 @@ export default function UserEditModal({
   onClose,
   onUserUpdated,
 }: UserEditModalProps) {
-  const [formData, setFormData] = useState<UserUpdateAPI>({
+  const [formData, setFormData] = useState<FormData>({
     firstName: user.firstName,
     lastName: user.lastName,
     isActive: user.isActive,
-    roleId: user.roleId,
+    role: user.role,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,8 +65,8 @@ export default function UserEditModal({
       if (formData.isActive !== user.isActive) {
         updateData.isActive = formData.isActive;
       }
-      if (formData.roleId !== user.roleId) {
-        updateData.roleId = formData.roleId;
+      if (formData.role !== user.role) {
+        updateData.role = formData.role;
       }
 
       // If no changes, just close the modal
@@ -77,11 +84,14 @@ export default function UserEditModal({
     }
   };
 
-  const handleChange = (field: keyof UserUpdateAPI, value: any) => {
+  const handleChange = (
+    field: keyof FormData,
+    value: FormData[keyof FormData]
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const canChangeRole = currentUser.roleId === UserRole.ADMIN;
+  const canChangeRole = currentUser.role === 'admin';
   const isEditingSelf = user.id === currentUser.id;
 
   return (
@@ -175,16 +185,16 @@ export default function UserEditModal({
             {canChangeRole && (
               <div>
                 <label
-                  htmlFor="roleId"
+                  htmlFor="role"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
                   Role
                 </label>
                 <select
-                  id="roleId"
-                  value={formData.roleId || user.roleId}
+                  id="role"
+                  value={formData.role}
                   onChange={(e) =>
-                    handleChange('roleId', Number(e.target.value) as UserRole)
+                    handleChange('role', e.target.value as RoleName)
                   }
                   disabled={isEditingSelf}
                   className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
@@ -194,7 +204,7 @@ export default function UserEditModal({
                   }`}
                 >
                   {roles.map((role) => (
-                    <option key={role.id} value={role.id}>
+                    <option key={role.name} value={role.name}>
                       {role.display_name}
                     </option>
                   ))}

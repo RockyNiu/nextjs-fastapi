@@ -1,9 +1,9 @@
 'use client';
 
 import { UserFilters, userService } from '@/services/userService';
-import { UserAPI, UserRole } from '@/types/api';
+import { RoleName, UserAPI } from '@/types/api';
 import { getPaginationPages, isPageNumber } from '@/utils/pagination';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import UserEditModal from './UserEditModal';
 import UserList from './UserList';
@@ -19,7 +19,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
   const [selectedUser, setSelectedUser] = useState<UserAPI | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState<UserRole | 'all'>('all');
+  const [roleFilter, setRoleFilter] = useState<RoleName | 'all'>('all');
   const [statusFilter, setStatusFilter] = useState<
     'all' | 'active' | 'inactive'
   >('all');
@@ -33,7 +33,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
     async (
       page: number = 1,
       search?: string,
-      role?: UserRole | 'all',
+      role?: RoleName | 'all',
       status?: 'all' | 'active' | 'inactive'
     ) => {
       try {
@@ -47,7 +47,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
           filters.search = search;
         }
         if (role && role !== 'all') {
-          filters.roleId = role;
+          filters.role = role;
         }
         if (status && status !== 'all') {
           filters.isActive = status === 'active';
@@ -125,7 +125,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
     setSearchTerm(term);
   };
 
-  const handleRoleFilter = (role: UserRole | 'all') => {
+  const handleRoleFilter = (role: RoleName | 'all') => {
     setRoleFilter(role);
     setCurrentPage(1); // Reset to first page when filter changes
   };
@@ -195,14 +195,14 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
               id="roleFilter"
               value={roleFilter}
               onChange={(e) =>
-                handleRoleFilter(e.target.value as UserRole | 'all')
+                handleRoleFilter(e.target.value as RoleName | 'all')
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="all">All Roles</option>
-              <option value={UserRole.USER}>User</option>
-              <option value={UserRole.MODERATOR}>Moderator</option>
-              <option value={UserRole.ADMIN}>Admin</option>
+              <option value="user">User</option>
+              <option value="moderator">Moderator</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
 

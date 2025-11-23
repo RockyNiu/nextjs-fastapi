@@ -64,20 +64,33 @@ def list_users(
     search: Optional[str] = Query(
         None, description="Search by name or email (case-insensitive)"
     ),
-    role_id: Optional[int] = Query(
-        None, description="Filter by role ID (1=User, 2=Moderator, 3=Admin)"
+    role_id: Optional[str] = Query(
+        None,
+        description="Filter by role ID (1, 2, 3) or role name (user, moderator, admin)",
     ),
     is_active: Optional[bool] = Query(None, description="Filter by active status"),
 ) -> Any:
     """
     List all users with pagination and filtering.
     """
+    # Convert role_id to integer (handles both int strings and role names)
+    resolved_role_id: Optional[int] = None
+    if role_id is not None:
+        # Try parsing as integer first
+        try:
+            resolved_role_id = int(role_id)
+        except ValueError:
+            # Try converting role name to role ID
+            role = UserRole.from_str(role_id)
+            if role is not None:
+                resolved_role_id = role.value
+
     user_service = UserService()
     users, total_count = user_service.get_users_filtered(
         skip=skip,
         limit=limit,
         search=search,
-        role_id=role_id,
+        role_id=resolved_role_id,
         is_active=is_active,
     )
 
@@ -144,11 +157,12 @@ def update_user(user_id: int, user_update_api: UserUpdateAPI) -> Any:
     Update user information.
     """
     # Convert API model to internal model
+    # Role validation is handled by Pydantic field_validator in UserUpdateAPI
     user_update = UserUpdate(
         first_name=user_update_api.first_name,
         last_name=user_update_api.last_name,
         is_active=user_update_api.is_active,
-        role_id=user_update_api.role_id,
+        role_id=user_update_api.role,
     )
 
     user_service = UserService()

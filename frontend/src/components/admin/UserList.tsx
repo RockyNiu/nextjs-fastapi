@@ -1,7 +1,7 @@
 'use client';
 
 import { userService } from '@/services/userService';
-import { UserAPI, UserRole } from '@/types/api';
+import { UserAPI } from '@/types/api';
 
 interface UserListProps {
   users: UserAPI[];
@@ -23,7 +23,7 @@ export default function UserList({
     if (user.id === currentUser.id) return false;
 
     // Only admins can edit other users
-    if (currentUser.roleId !== UserRole.ADMIN) return false;
+    if (currentUser.role !== 'admin') return false;
 
     // Admins can edit anyone except other admins (unless they're editing role to non-admin)
     return true;
@@ -34,7 +34,7 @@ export default function UserList({
     if (user.id === currentUser.id) return false;
 
     // Only admins can toggle status
-    return currentUser.roleId === UserRole.ADMIN;
+    return currentUser.role === 'admin';
   };
 
   if (loading) {
@@ -142,9 +142,9 @@ export default function UserList({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
-                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${userService.getRoleBadgeColor(user.roleId)}`}
+                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${userService.getRoleBadgeColor(user.role)}`}
                   >
-                    {userService.getRoleDisplayName(user.roleId)}
+                    {userService.getRoleDisplayName(user.role)}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">

@@ -3,7 +3,7 @@
 import UserManagement from '@/components/admin/UserManagement';
 import Layout from '@/components/layout/Layout';
 import { authService } from '@/services/authService';
-import { UserAPI, UserRole } from '@/types/api';
+import { UserAPI } from '@/types/api';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -24,10 +24,7 @@ export default function AdminUsersPage() {
         setCurrentUser(user);
 
         // Check if user has admin or moderator role
-        if (
-          user.roleId !== UserRole.ADMIN &&
-          user.roleId !== UserRole.MODERATOR
-        ) {
+        if (user.role !== 'admin' && user.role !== 'moderator') {
           router.push('/dashboard');
           return;
         }

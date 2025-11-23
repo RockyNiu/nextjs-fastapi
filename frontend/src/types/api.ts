@@ -1,10 +1,6 @@
 // Frontend TypeScript types in camelCase (converted from backend snake_case)
 
-export enum UserRole {
-  USER = 1,
-  MODERATOR = 2,
-  ADMIN = 3,
-}
+export type RoleName = 'user' | 'moderator' | 'admin';
 
 export interface UserCreateAPI {
   email: string;
@@ -24,7 +20,7 @@ export interface UserAPI {
   firstName: string;
   lastName: string;
   isActive: boolean;
-  roleId: UserRole;
+  role: RoleName;
   dateCreated: string;
   dateUpdated: string;
   emailVerified: boolean;
@@ -71,7 +67,7 @@ export interface UserUpdateAPI {
   firstName?: string;
   lastName?: string;
   isActive?: boolean;
-  roleId?: UserRole;
+  role?: RoleName;
 }
 
 export interface UserListResponseAPI {

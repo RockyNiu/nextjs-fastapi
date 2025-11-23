@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated, List, Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 from app.db.orm.user_role_orm import UserRole
 
@@ -96,6 +96,7 @@ class UserAPI(BaseModel):
                 "date_created": "2025-01-01T12:00:00Z",
                 "date_updated": "2025-01-01T12:00:00Z",
                 "email_verified": True,
+                "role": "user",
             }
         },
     )
@@ -146,13 +147,24 @@ class UserAPI(BaseModel):
             json_schema_extra={"example": True},
         ),
     ]
-    role_id: Annotated[
-        UserRole,
+    role: Annotated[
+        str,
         Field(
-            description="User's role ID",
-            json_schema_extra={"example": UserRole.USER},
+            description="User's role name (user, moderator, or admin)",
+            json_schema_extra={"example": "user"},
+            validation_alias="role_id",
         ),
     ]
+
+    @field_validator("role", mode="before")
+    @classmethod
+    def convert_role_id_to_name(cls, v: UserRole | str | int) -> str:
+        """Convert role_id (UserRole enum or int) to role name string."""
+        if isinstance(v, str):
+            return v
+        if isinstance(v, int):
+            v = UserRole(v)
+        return v.name.lower()
 
 
 class UserUpdateAPI(BaseModel):
@@ -164,7 +176,7 @@ class UserUpdateAPI(BaseModel):
                 "first_name": "John",
                 "last_name": "Doe",
                 "is_active": True,
-                "role_id": UserRole.USER,
+                "role": "user",
             }
         }
     )
@@ -197,14 +209,32 @@ class UserUpdateAPI(BaseModel):
             json_schema_extra={"example": True},
         ),
     ]
-    role_id: Annotated[
+    role: Annotated[
         Optional[UserRole],
         Field(
             default=None,
-            description="User's role ID",
-            json_schema_extra={"example": UserRole.USER},
+            description="User's role name (user, moderator, or admin)",
+            json_schema_extra={"example": "user"},
         ),
     ]
+
+    @field_validator("role", mode="before")
+    @classmethod
+    def validate_role(cls, v: Optional[str]) -> Optional[UserRole]:
+        """Validate and convert role input to UserRole enum.
+
+        Accepts role name string (e.g., 'admin') or role ID integer (e.g., 3).
+        """
+        if v is None:
+            return v
+        if isinstance(v, str):
+            role = UserRole.from_str(v)
+            if role is None:
+                raise ValueError(
+                    f"Invalid role. Must be one of: {UserRole.valid_names()}"
+                )
+            return role
+        raise ValueError("Role must be a string or integer")
 
 
 class UserListResponseAPI(BaseModel):
@@ -220,7 +250,7 @@ class UserListResponseAPI(BaseModel):
                         "first_name": "John",
                         "last_name": "Doe",
                         "is_active": True,
-                        "role_id": UserRole.USER,
+                        "role": "user",
                         "date_created": "2025-01-01T12:00:00Z",
                         "date_updated": "2025-01-01T12:00:00Z",
                         "email_verified": True,

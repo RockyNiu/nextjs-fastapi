@@ -1,21 +1,21 @@
 import {
   MessageResponseAPI,
+  RoleName,
   UserAPI,
   UserListResponseAPI,
-  UserRole,
   UserUpdateAPI,
 } from '@/types/api';
 import { apiService } from './apiRequest';
 
 export interface RoleOption {
-  id: UserRole;
-  name: string;
+  id: number;
+  name: RoleName;
   display_name: string;
 }
 
 export interface UserFilters {
   search?: string;
-  roleId?: UserRole | null;
+  role?: RoleName | null;
   isActive?: boolean | null;
 }
 
@@ -32,8 +32,8 @@ class UserService {
     if (filters?.search) {
       params.append('search', filters.search);
     }
-    if (filters?.roleId != null) {
-      params.append('role_id', filters.roleId.toString());
+    if (filters?.role != null) {
+      params.append('role_id', filters.role);
     }
     if (filters?.isActive != null) {
       params.append('is_active', filters.isActive.toString());
@@ -93,26 +93,26 @@ class UserService {
     return response.data;
   }
 
-  getRoleDisplayName(roleId: UserRole): string {
-    switch (roleId) {
-      case UserRole.ADMIN:
+  getRoleDisplayName(role: RoleName): string {
+    switch (role) {
+      case 'admin':
         return 'Admin';
-      case UserRole.MODERATOR:
+      case 'moderator':
         return 'Moderator';
-      case UserRole.USER:
+      case 'user':
         return 'User';
       default:
         return 'Unknown';
     }
   }
 
-  getRoleBadgeColor(roleId: UserRole): string {
-    switch (roleId) {
-      case UserRole.ADMIN:
+  getRoleBadgeColor(role: RoleName): string {
+    switch (role) {
+      case 'admin':
         return 'bg-red-100 text-red-800';
-      case UserRole.MODERATOR:
+      case 'moderator':
         return 'bg-yellow-100 text-yellow-800';
-      case UserRole.USER:
+      case 'user':
         return 'bg-green-100 text-green-800';
       default:
         return 'bg-gray-100 text-gray-800';
