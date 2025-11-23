@@ -86,7 +86,7 @@ class UserService {
 
   async getRoles(): Promise<RoleOption[]> {
     const response = await apiService.request<RoleOption[]>({
-      endpoint: '/users/roles/',
+      endpoint: '/users/roles',
       method: 'GET',
       requiresAuth: true,
     });
