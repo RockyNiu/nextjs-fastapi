@@ -270,7 +270,7 @@ class UserListResponseAPI(BaseModel):
     total: Annotated[
         int,
         Field(
-            description="Total number of users returned",
+            description="Total number of users matching filters",
             json_schema_extra={"example": 1},
         ),
     ]
