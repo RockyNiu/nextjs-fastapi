@@ -28,12 +28,13 @@ def upgrade() -> None:
         sa.UniqueConstraint("value", name="value"),
     )
 
-    # Insert role values
+    # Insert role values (ON CONFLICT DO NOTHING makes it idempotent)
     op.execute("""
-        INSERT INTO ref_user_role (id, value) VALUES 
+        INSERT INTO ref_user_role (id, value) VALUES
         (1, 'user'),
         (2, 'moderator'),
         (3, 'admin')
+        ON CONFLICT DO NOTHING
     """)
 
     # Add role_id foreign key column
