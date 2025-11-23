@@ -18,7 +18,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/roles/",
+    "/roles",
     response_model=List[dict],
     dependencies=[Depends(require_moderator_or_admin)],
     responses={
