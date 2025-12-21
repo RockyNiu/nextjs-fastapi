@@ -2,11 +2,12 @@ from datetime import datetime
 from typing import Optional
 
 import sqlalchemy_utc
-from sqlalchemy import Boolean, DateTime, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from app.db.orm.base_orm import BaseORM
+from app.db.orm.user_role_orm import RefUserRole, UserRole
 
 
 class UserORM(BaseORM):
@@ -22,6 +23,9 @@ class UserORM(BaseORM):
     first_name: Mapped[str] = mapped_column(String(100), nullable=False)
     last_name: Mapped[str] = mapped_column(String(100), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    role_id: Mapped[UserRole] = mapped_column(
+        ForeignKey("ref_user_role.id"), default=UserRole.USER, nullable=False
+    )
     email_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     email_verification_token: Mapped[Optional[str]] = mapped_column(
         String(255), nullable=True
@@ -42,6 +46,9 @@ class UserORM(BaseORM):
         server_default=func.current_timestamp(),
         nullable=False,
     )
+
+    # Relationship to role
+    role: Mapped[RefUserRole] = relationship("RefUserRole")
 
     @property
     def full_name(self) -> str:

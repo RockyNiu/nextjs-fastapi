@@ -1,6 +1,7 @@
 'use client';
 
 import { authService } from '@/services/authService';
+import { UserAPI } from '@/types/api';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -13,13 +14,31 @@ export default function Header({ onAuthChange }: HeaderProps) {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState<UserAPI | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const checkAuthStatus = useCallback(() => {
-    const authenticated = authService.isAuthenticated();
-    setIsAuthenticated(authenticated);
-    setIsLoading(false);
-    if (onAuthChange) {
-      onAuthChange(authenticated);
+  const checkAuthStatus = useCallback(async () => {
+    try {
+      const authenticated = authService.isAuthenticated();
+      setIsAuthenticated(authenticated);
+
+      if (authenticated) {
+        try {
+          const user = await authService.getCurrentUser();
+          setCurrentUser(user);
+        } catch (error) {
+          console.error('Failed to get current user:', error);
+          setCurrentUser(null);
+        }
+      } else {
+        setCurrentUser(null);
+      }
+
+      if (onAuthChange) {
+        onAuthChange(authenticated);
+      }
+    } finally {
+      setIsLoading(false);
     }
   }, [onAuthChange]);
 
@@ -31,6 +50,7 @@ export default function Header({ onAuthChange }: HeaderProps) {
     try {
       await authService.logout();
       setIsAuthenticated(false);
+      setCurrentUser(null);
       if (onAuthChange) {
         onAuthChange(false);
       }
@@ -39,6 +59,10 @@ export default function Header({ onAuthChange }: HeaderProps) {
       console.error('Logout failed:', error);
     }
   };
+
+  const canAccessAdmin =
+    currentUser &&
+    (currentUser.role === 'admin' || currentUser.role === 'moderator');
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
@@ -61,12 +85,22 @@ export default function Header({ onAuthChange }: HeaderProps) {
               Home
             </Link>
             {isAuthenticated && (
-              <Link
-                href="/dashboard"
-                className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Dashboard
-              </Link>
+              <>
+                <Link
+                  href="/dashboard"
+                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Dashboard
+                </Link>
+                {canAccessAdmin && (
+                  <Link
+                    href="/admin/users"
+                    className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Admin
+                  </Link>
+                )}
+              </>
             )}
           </nav>
 
@@ -74,7 +108,7 @@ export default function Header({ onAuthChange }: HeaderProps) {
             {!isLoading && (
               <>
                 {isAuthenticated ? (
-                  <div className="flex items-center space-x-4">
+                  <div className="hidden md:flex items-center space-x-4">
                     <Link
                       href="/dashboard"
                       className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
@@ -89,7 +123,7 @@ export default function Header({ onAuthChange }: HeaderProps) {
                     </button>
                   </div>
                 ) : (
-                  <div className="flex items-center space-x-4">
+                  <div className="hidden md:flex items-center space-x-4">
                     <Link
                       href="/login"
                       className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
@@ -106,8 +140,113 @@ export default function Header({ onAuthChange }: HeaderProps) {
                 )}
               </>
             )}
+
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              aria-expanded={isMobileMenuOpen}
+            >
+              <span className="sr-only">Open main menu</span>
+              {/* Hamburger icon */}
+              {!isMobileMenuOpen ? (
+                <svg
+                  className="block h-6 w-6"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="block h-6 w-6"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
+
+        {/* Mobile menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              <Link
+                href="/"
+                className="text-gray-700 hover:text-blue-600 hover:bg-gray-50 block px-3 py-2 rounded-md text-base font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Home
+              </Link>
+              {isAuthenticated && (
+                <>
+                  <Link
+                    href="/dashboard"
+                    className="text-gray-700 hover:text-blue-600 hover:bg-gray-50 block px-3 py-2 rounded-md text-base font-medium"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  {canAccessAdmin && (
+                    <Link
+                      href="/admin/users"
+                      className="text-gray-700 hover:text-blue-600 hover:bg-gray-50 block px-3 py-2 rounded-md text-base font-medium"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Admin
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="text-left w-full text-red-600 hover:text-red-700 hover:bg-red-50 block px-3 py-2 rounded-md text-base font-medium"
+                  >
+                    Logout
+                  </button>
+                </>
+              )}
+              {!isAuthenticated && (
+                <>
+                  <Link
+                    href="/login"
+                    className="text-gray-700 hover:text-blue-600 hover:bg-gray-50 block px-3 py-2 rounded-md text-base font-medium"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="bg-blue-600 hover:bg-blue-700 text-white block px-3 py-2 rounded-md text-base font-medium"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );

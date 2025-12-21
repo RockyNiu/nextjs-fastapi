@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Optional
+from typing import List, Optional
 
 from app.common.logger import logger
 from app.db.dao.user_dao import UserDAO
@@ -10,6 +10,7 @@ from app.entities.user import (
     User,
     UserCreate,
     UserLogin,
+    UserUpdate,
     UserWithAccessToken,
 )
 from app.exceptions.user_exceptions import (
@@ -177,3 +178,155 @@ class UserService:
         except Exception as e:
             logger.error(f"Failed to resend verification email to {db_user.email}: {e}")
             raise EmailSendError("Failed to send verification email")
+
+    def get_all_users(self, skip: int = 0, limit: int = 100) -> List[User]:
+        """Get all users with pagination.
+
+        Args:
+            skip: Number of records to skip for pagination. Defaults to 0.
+            limit: Maximum number of records to return. Defaults to 100.
+
+        Returns:
+            List of User objects.
+        """
+        return self.user_dao.get_all_users(skip=skip, limit=limit)
+
+    def get_total_users_count(self) -> int:
+        """Get total count of all users in the database.
+
+        Returns:
+            Total number of users.
+        """
+        return self.user_dao.count_all()
+
+    def get_users_filtered(
+        self,
+        skip: int = 0,
+        limit: int = 100,
+        search: Optional[str] = None,
+        role_id: Optional[int] = None,
+        is_active: Optional[bool] = None,
+    ) -> tuple[List[User], int]:
+        """Get users with filtering and pagination.
+
+        Args:
+            skip: Number of records to skip
+            limit: Maximum number of records to return
+            search: Search term for name or email (case-insensitive)
+            role_id: Filter by role ID
+            is_active: Filter by active status
+
+        Returns:
+            Tuple of (list of users, total count matching filters)
+        """
+        return self.user_dao.get_users_filtered(
+            skip=skip,
+            limit=limit,
+            search=search,
+            role_id=role_id,
+            is_active=is_active,
+        )
+
+    def get_user_by_id(self, user_id: int) -> Optional[User]:
+        """Get a user by their unique identifier.
+
+        Args:
+            user_id: The unique identifier of the user.
+
+        Returns:
+            User object if found, None otherwise.
+        """
+        return self.user_dao.get_by_id(user_id)
+
+    def update_user(self, user_id: int, user_update: UserUpdate) -> Optional[User]:
+        """Update user information.
+
+        Args:
+            user_id: The unique identifier of the user to update.
+            user_update: UserUpdate object containing the fields to update.
+                Only non-None fields will be updated.
+
+        Returns:
+            Updated User object if found, None if user not found.
+        """
+        return self.user_dao.update_user(user_id, user_update)
+
+    def deactivate_user(self, user_id: int) -> Optional[User]:
+        """Deactivate a user account.
+
+        Sets the user's is_active status to False, preventing them from
+        logging in or accessing protected resources.
+
+        Args:
+            user_id: The unique identifier of the user to deactivate.
+
+        Returns:
+            Updated User object if found, None if user not found.
+        """
+        user_update = UserUpdate(is_active=False)
+        return self.user_dao.update_user(user_id, user_update)
+
+    def activate_user(self, user_id: int) -> Optional[User]:
+        """Activate a user account.
+
+        Sets the user's is_active status to True, allowing them to
+        log in and access protected resources.
+
+        Args:
+            user_id: The unique identifier of the user to activate.
+
+        Returns:
+            Updated User object if found, None if user not found.
+        """
+        user_update = UserUpdate(is_active=True)
+        return self.user_dao.update_user(user_id, user_update)
+
+    def create_user_without_verification(
+        self, user_create: UserCreate, email_verified: bool = False
+    ) -> User:
+        """Create a user without sending verification email.
+
+        Useful for seeding test/dummy users.
+
+        Args:
+            user_create: User creation data
+            email_verified: Whether to mark the email as already verified
+
+        Returns:
+            The created user
+        """
+        # Check if user already exists
+        if self.user_dao.get_by_email(user_create.email):
+            raise UserAlreadyExistsError("Email already registered")
+
+        # Create user (this sets email_verification_token in DAO)
+        user = self.user_dao.create_user(user_create)
+
+        # If email should be pre-verified, update it
+        if email_verified:
+            self.user_dao.set_email_verified(user.id, True)
+            user = self.user_dao.get_by_id(user.id)
+
+        return user
+
+    def get_users_by_email_domain(self, domain: str) -> List[User]:
+        """Get all users with emails matching a domain pattern.
+
+        Args:
+            domain: Email domain to match (e.g., "@dummyuser.com")
+
+        Returns:
+            List of users with matching email domain
+        """
+        return self.user_dao.get_users_by_email_domain(domain)
+
+    def delete_user(self, user_id: int) -> bool:
+        """Delete a user by ID.
+
+        Args:
+            user_id: ID of the user to delete
+
+        Returns:
+            True if user was deleted, False if not found
+        """
+        return self.user_dao.delete_user(user_id)

@@ -1,5 +1,7 @@
 // Frontend TypeScript types in camelCase (converted from backend snake_case)
 
+export type RoleName = 'user' | 'moderator' | 'admin';
+
 export interface UserCreateAPI {
   email: string;
   firstName: string;
@@ -18,6 +20,7 @@ export interface UserAPI {
   firstName: string;
   lastName: string;
   isActive: boolean;
+  role: RoleName;
   dateCreated: string;
   dateUpdated: string;
   emailVerified: boolean;
@@ -58,6 +61,20 @@ export interface ErrorResponseAPI {
   error: string;
   detail?: string;
   success: boolean;
+}
+
+export interface UserUpdateAPI {
+  firstName?: string;
+  lastName?: string;
+  isActive?: boolean;
+  role?: RoleName;
+}
+
+export interface UserListResponseAPI {
+  users: UserAPI[];
+  total: number;
+  skip: number;
+  limit: number;
 }
 
 // API Response types
